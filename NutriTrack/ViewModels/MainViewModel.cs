@@ -11,7 +11,7 @@ namespace NutriTrack.ViewModels
         private readonly IDailySummaryService _dailySummaryService;
         private readonly IUserSettingsService _userSettingsService;
 
-        // Cached ViewModels
+        // Кэшированные ViewModels
         private readonly ProductViewModel _productViewModel;
         private readonly MealEntryViewModel _mealEntryViewModel;
         private readonly DailySummaryViewModel _dailySummaryViewModel;
@@ -30,27 +30,28 @@ namespace NutriTrack.ViewModels
         public ICommand ShowSettingsCommand { get; }
 
         public MainViewModel(IProductService productService,
-                             IMealEntryService mealEntryService,
-                             IDailySummaryService dailySummaryService,
-                             IUserSettingsService userSettingsService)
+                           IMealEntryService mealEntryService,
+                           IDailySummaryService dailySummaryService,
+                           IUserSettingsService userSettingsService)
         {
             _productService = productService;
             _mealEntryService = mealEntryService;
             _dailySummaryService = dailySummaryService;
             _userSettingsService = userSettingsService;
 
-            // Initialize cached ViewModels
+            // Инициализируем ViewModels
             _productViewModel = new ProductViewModel(_productService);
             _mealEntryViewModel = new MealEntryViewModel(_mealEntryService, _productService);
             _dailySummaryViewModel = new DailySummaryViewModel(_dailySummaryService, _mealEntryService, _productService);
             _settingsViewModel = new SettingsViewModel(_userSettingsService);
 
+            // Настраиваем команды для переключения между ViewModels
             ShowProductsCommand = new RelayCommand(() => CurrentViewModel = _productViewModel);
             ShowMealEntriesCommand = new RelayCommand(() => CurrentViewModel = _mealEntryViewModel);
             ShowDailySummaryCommand = new RelayCommand(() => CurrentViewModel = _dailySummaryViewModel);
             ShowSettingsCommand = new RelayCommand(() => CurrentViewModel = _settingsViewModel);
 
-            // Show products by default
+            // По умолчанию показываем продукты
             CurrentViewModel = _productViewModel;
         }
     }

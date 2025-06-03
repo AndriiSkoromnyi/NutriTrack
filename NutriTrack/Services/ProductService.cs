@@ -23,7 +23,10 @@ namespace NutriTrack.Services
 
         public ProductService()
         {
-            var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NutriTrack");
+            var appDataPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "NutriTrack"
+            );
             Directory.CreateDirectory(appDataPath);
             _filePath = Path.Combine(appDataPath, "products.json");
         }

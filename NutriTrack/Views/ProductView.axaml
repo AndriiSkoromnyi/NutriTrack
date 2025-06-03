@@ -9,9 +9,14 @@
              x:DataType="viewModels:ProductViewModel">
 
     <Grid RowDefinitions="Auto,*" Margin="10" ColumnDefinitions="*,Auto">
-        <ListBox ItemsSource="{Binding Products}" 
-                 SelectedItem="{Binding SelectedProduct}" 
-                 Grid.RowSpan="2" Grid.Column="0" Margin="0,0,10,0">
+        <Grid Grid.Column="0" Grid.Row="0" Margin="0,0,10,10">
+            <TextBlock Text="Products" FontWeight="Bold" VerticalAlignment="Center"/>
+        </Grid>
+        
+        <ListBox Grid.Column="0" Grid.Row="1"
+                 ItemsSource="{Binding Products}" 
+                 SelectedItem="{Binding SelectedProduct}"
+                 Margin="0,0,10,0">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}" />
@@ -19,27 +24,31 @@
             </ListBox.ItemTemplate>
         </ListBox>
         
-        <StackPanel Grid.Column="1" Grid.Row="0" Spacing="5">
-            <TextBlock Text="Product Details" FontWeight="Bold" />
+        <StackPanel Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Spacing="2" Width="300">
+            <TextBlock Text="Product Details" FontWeight="Bold" Margin="0,0,0,10"/>
+            
             <TextBlock Text="Product Name:" />
             <TextBox Text="{Binding SelectedProduct.Name, Mode=TwoWay}" />
-            <TextBlock Text="Calories (per 100g):" />
+            
+            <TextBlock Text="Calories (per 100g):" Margin="0,8,0,0"/>
             <TextBox Text="{Binding SelectedProduct.CaloriesPer100g, Mode=TwoWay}" />
-            <TextBlock Text="Protein (g):" />
+            
+            <TextBlock Text="Protein (g):" Margin="0,8,0,0"/>
             <TextBox Text="{Binding SelectedProduct.Protein, Mode=TwoWay}" />
-            <TextBlock Text="Fat (g):" />
+            
+            <TextBlock Text="Fat (g):" Margin="0,8,0,0"/>
             <TextBox Text="{Binding SelectedProduct.Fat, Mode=TwoWay}" />
-            <TextBlock Text="Carbohydrates (g):" />
+            
+            <TextBlock Text="Carbohydrates (g):" Margin="0,8,0,0"/>
             <TextBox Text="{Binding SelectedProduct.Carbohydrates, Mode=TwoWay}" />
-        </StackPanel>
-        
-        <StackPanel Grid.Column="1" Grid.Row="1" 
-                    Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-            <Button Content="Add" Command="{Binding AddProductCommand}" />
-            <Button Content="Save" Command="{Binding SaveProductCommand}" 
-                    IsEnabled="{Binding SelectedProduct, Converter={StaticResource NullToBoolConverter}}" />
-            <Button Content="Delete" Command="{Binding DeleteProductCommand}" 
-                    IsEnabled="{Binding SelectedProduct, Converter={StaticResource NullToBoolConverter}}" />
+            
+            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <Button Content="Add" Command="{Binding AddProductCommand}" />
+                <Button Content="Save" Command="{Binding SaveProductCommand}" 
+                        IsEnabled="{Binding SelectedProduct, Converter={StaticResource NullToBoolConverter}}" />
+                <Button Content="Delete" Command="{Binding DeleteProductCommand}" 
+                        IsEnabled="{Binding SelectedProduct, Converter={StaticResource NullToBoolConverter}}" />
+            </StackPanel>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -32,9 +32,6 @@ namespace NutriTrack.ViewModels
             AddProductCommand = new AsyncRelayCommand(AddProductAsync);
             SaveProductCommand = new AsyncRelayCommand(SaveProductAsync);
             DeleteProductCommand = new AsyncRelayCommand(DeleteProductAsync);
-
-            // Load products when ViewModel is created
-            _ = LoadProductsAsync();
         }
 
         private async Task LoadProductsAsync()

@@ -65,3 +65,4 @@ C:\Users\krend\RiderProjects\NutriTrack\NutriTrack\obj\Debug\net9.0\refint\Nutri
 C:\Users\krend\RiderProjects\NutriTrack\NutriTrack\obj\Debug\net9.0\NutriTrack.pdb
 C:\Users\krend\RiderProjects\NutriTrack\NutriTrack\obj\Debug\net9.0\NutriTrack.genruntimeconfig.cache
 C:\Users\krend\RiderProjects\NutriTrack\NutriTrack\obj\Debug\net9.0\ref\NutriTrack.dll
+C:\Users\krend\RiderProjects\NutriTrack\NutriTrack\obj\Debug\net9.0\NutriTrack.sourcelink.json

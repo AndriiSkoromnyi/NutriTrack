@@ -9,7 +9,6 @@
              x:DataType="viewModels:ProductViewModel">
 
     <Grid RowDefinitions="Auto,*" Margin="10" ColumnDefinitions="*,Auto">
-        <!-- ListBox с использованием ItemsSource -->
         <ListBox ItemsSource="{Binding Products}" 
                  SelectedItem="{Binding SelectedProduct}" 
                  Grid.RowSpan="2" Grid.Column="0" Margin="0,0,10,0">
@@ -19,18 +18,21 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-
-        <!-- Правая панель редактирования -->
+        
         <StackPanel Grid.Column="1" Grid.Row="0" Spacing="5">
             <TextBlock Text="Product Details" FontWeight="Bold" />
-            <TextBox Watermark="Name" Text="{Binding SelectedProduct.Name, Mode=TwoWay}" />
-            <TextBox Watermark="Calories per 100g" Text="{Binding SelectedProduct.CaloriesPer100g, Mode=TwoWay}" />
-            <TextBox Watermark="Protein" Text="{Binding SelectedProduct.Protein, Mode=TwoWay}" />
-            <TextBox Watermark="Fat" Text="{Binding SelectedProduct.Fat, Mode=TwoWay}" />
-            <TextBox Watermark="Carbohydrates" Text="{Binding SelectedProduct.Carbohydrates, Mode=TwoWay}" />
+            <TextBlock Text="Product Name:" />
+            <TextBox Text="{Binding SelectedProduct.Name, Mode=TwoWay}" />
+            <TextBlock Text="Calories (per 100g):" />
+            <TextBox Text="{Binding SelectedProduct.CaloriesPer100g, Mode=TwoWay}" />
+            <TextBlock Text="Protein (g):" />
+            <TextBox Text="{Binding SelectedProduct.Protein, Mode=TwoWay}" />
+            <TextBlock Text="Fat (g):" />
+            <TextBox Text="{Binding SelectedProduct.Fat, Mode=TwoWay}" />
+            <TextBlock Text="Carbohydrates (g):" />
+            <TextBox Text="{Binding SelectedProduct.Carbohydrates, Mode=TwoWay}" />
         </StackPanel>
-
-        <!-- Кнопки управления -->
+        
         <StackPanel Grid.Column="1" Grid.Row="1" 
                     Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
             <Button Content="Add" Command="{Binding AddProductCommand}" />

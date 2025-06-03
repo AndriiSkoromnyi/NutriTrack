@@ -10,8 +10,7 @@
     
     <Grid Margin="10" RowDefinitions="Auto,*,Auto" ColumnDefinitions="*,Auto">
         <DatePicker SelectedDate="{Binding SelectedDate}" Grid.ColumnSpan="2" />
-
-        <!-- ListBox для записей приёмов пищи -->
+        
         <ListBox ItemsSource="{Binding MealEntries}" 
                  SelectedItem="{Binding SelectedMealEntry}" 
                  Grid.Row="1" Grid.Column="0" Margin="0,5,10,5">
@@ -25,10 +24,8 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-
-        <!-- Правая панель редактирования -->
+        
         <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Spacing="5">
-            <!-- Выбор продукта -->
             <ComboBox ItemsSource="{Binding Products}" 
                       SelectedItem="{Binding SelectedProduct}">
                 <ComboBox.ItemTemplate>
@@ -37,12 +34,10 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-
-            <!-- Вес продукта -->
+            
             <TextBox Watermark="Weight (g)" 
                      Text="{Binding SelectedMealEntry.Weight, Mode=TwoWay}" />
-
-            <!-- Выбор типа приёма пищи -->
+            
             <ComboBox ItemsSource="{Binding MealTypeNames}" SelectedItem="{Binding SelectedMealTypeName, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -51,13 +46,11 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
 
-
-            <!-- Время приёма пищи -->
+            
             <TextBox Watermark="Time (HH:mm)" 
                      Text="{Binding SelectedMealEntry.Date, Converter={StaticResource DateTimeToTimeStringConverter}, Mode=TwoWay}" />
         </StackPanel>
-
-        <!-- Кнопки управления -->
+        
         <StackPanel Grid.Row="2" Grid.ColumnSpan="2" 
                     Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
             <Button Content="Add" Command="{Binding AddMealEntryCommand}" />

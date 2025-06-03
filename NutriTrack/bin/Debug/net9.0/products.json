@@ -1,10 +1,18 @@
 [
   {
-    "Id": "127bd60b-b5a1-48e1-971a-d35a108831a2",
-    "Name": "Tomato",
-    "CaloriesPer100g": 100,
-    "Protein": 5,
-    "Fat": 10,
-    "Carbohydrates": 1
+    "Id": "78b1f419-7a2c-4cd3-9c99-c57593e55877",
+    "Name": "\u0425\u0443\u0439",
+    "CaloriesPer100g": 0,
+    "Protein": 0,
+    "Fat": 5,
+    "Carbohydrates": 0
+  },
+  {
+    "Id": "829cf2ff-5a07-4c37-afe8-ffdd9e92034f",
+    "Name": "Potato",
+    "CaloriesPer100g": 5,
+    "Protein": 6,
+    "Fat": 100,
+    "Carbohydrates": 556
   }
 ]

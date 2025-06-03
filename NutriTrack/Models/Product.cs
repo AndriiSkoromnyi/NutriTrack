@@ -1,9 +1,18 @@
 using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace NutriTrack.Models
 {
-    public class Product
+    public class Product : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         public Guid Id { get; set; } = Guid.NewGuid();
 
         private string _name;
@@ -13,8 +22,12 @@ namespace NutriTrack.Models
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
-                    throw new ArgumentException("Название продукта не может быть пустым.");
-                _name = value;
+                    throw new ArgumentException("Product name cannot be empty.");
+                if (_name != value)
+                {
+                    _name = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -25,8 +38,12 @@ namespace NutriTrack.Models
             set
             {
                 if (value < 0)
-                    throw new ArgumentException("Калорийность не может быть отрицательной.");
-                _caloriesPer100g = value;
+                    throw new ArgumentException("Calories cannot be negative.");
+                if (_caloriesPer100g != value)
+                {
+                    _caloriesPer100g = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -37,8 +54,12 @@ namespace NutriTrack.Models
             set
             {
                 if (value < 0)
-                    throw new ArgumentException("Белки не могут быть отрицательными.");
-                _protein = value;
+                    throw new ArgumentException("Protein cannot be negative.");
+                if (_protein != value)
+                {
+                    _protein = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -49,8 +70,12 @@ namespace NutriTrack.Models
             set
             {
                 if (value < 0)
-                    throw new ArgumentException("Жиры не могут быть отрицательными.");
-                _fat = value;
+                    throw new ArgumentException("Fat cannot be negative.");
+                if (_fat != value)
+                {
+                    _fat = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -61,8 +86,12 @@ namespace NutriTrack.Models
             set
             {
                 if (value < 0)
-                    throw new ArgumentException("Углеводы не могут быть отрицательными.");
-                _carbohydrates = value;
+                    throw new ArgumentException("Carbohydrates cannot be negative.");
+                if (_carbohydrates != value)
+                {
+                    _carbohydrates = value;
+                    OnPropertyChanged();
+                }
             }
         }
     }

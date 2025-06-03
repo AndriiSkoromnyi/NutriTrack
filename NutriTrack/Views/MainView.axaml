@@ -10,15 +10,13 @@
         x:DataType="vm:MainViewModel">
 
     <DockPanel>
-        <!-- Навигация -->
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10" Spacing="10">
             <Button Content="Products" Command="{Binding ShowProductsCommand}" />
             <Button Content="Meal Entries" Command="{Binding ShowMealEntriesCommand}" />
             <Button Content="Daily Summary" Command="{Binding ShowDailySummaryCommand}" />
             <Button Content="Settings" Command="{Binding ShowSettingsCommand}" />
         </StackPanel>
-
-        <!-- Область отображения текущего ViewModel -->
+        
         <ContentControl Content="{Binding CurrentViewModel}" />
     </DockPanel>
 </Window>

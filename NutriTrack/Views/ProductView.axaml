@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:models="clr-namespace:NutriTrack.Models"
+             xmlns:viewModels="clr-namespace:NutriTrack.ViewModels"
+             mc:Ignorable="d"
+             x:Class="NutriTrack.Views.ProductView"
+             x:DataType="viewModels:ProductViewModel">
+
+    <Grid RowDefinitions="Auto,*" Margin="10" ColumnDefinitions="*,Auto">
+        <!-- ListBox с использованием ItemsSource -->
+        <ListBox ItemsSource="{Binding Products}" 
+                 SelectedItem="{Binding SelectedProduct}" 
+                 Grid.RowSpan="2" Grid.Column="0" Margin="0,0,10,0">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Правая панель редактирования -->
+        <StackPanel Grid.Column="1" Grid.Row="0" Spacing="5">
+            <TextBlock Text="Product Details" FontWeight="Bold" />
+            <TextBox Watermark="Name" Text="{Binding SelectedProduct.Name, Mode=TwoWay}" />
+            <TextBox Watermark="Calories per 100g" Text="{Binding SelectedProduct.CaloriesPer100g, Mode=TwoWay}" />
+            <TextBox Watermark="Protein" Text="{Binding SelectedProduct.Protein, Mode=TwoWay}" />
+            <TextBox Watermark="Fat" Text="{Binding SelectedProduct.Fat, Mode=TwoWay}" />
+            <TextBox Watermark="Carbohydrates" Text="{Binding SelectedProduct.Carbohydrates, Mode=TwoWay}" />
+        </StackPanel>
+
+        <!-- Кнопки управления -->
+        <StackPanel Grid.Column="1" Grid.Row="1" 
+                    Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+            <Button Content="Add" Command="{Binding AddProductCommand}" />
+            <Button Content="Save" Command="{Binding SaveProductCommand}" 
+                    IsEnabled="{Binding SelectedProduct, Converter={StaticResource NullToBoolConverter}}" />
+            <Button Content="Delete" Command="{Binding DeleteProductCommand}" 
+                    IsEnabled="{Binding SelectedProduct, Converter={StaticResource NullToBoolConverter}}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

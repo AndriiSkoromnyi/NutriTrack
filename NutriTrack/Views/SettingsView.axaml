@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:NutriTrack.ViewModels"
+             mc:Ignorable="d"
+             x:Class="NutriTrack.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+    <StackPanel Margin="10" Spacing="10" Width="300">
+        <TextBlock Text="User Settings" FontWeight="Bold" FontSize="16" />
+
+        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <TextBlock Text="Daily Calorie Goal:" Width="150" VerticalAlignment="Center" />
+            <TextBox Text="{Binding Settings.DailyCalorieGoal, Mode=TwoWay}" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <TextBlock Text="Weight Unit:" Width="150" VerticalAlignment="Center" />
+            <ComboBox ItemsSource="{Binding WeightUnits}" SelectedItem="{Binding Settings.WeightUnit, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+
+        <Button Content="Save" Command="{Binding SaveSettingsCommand}" HorizontalAlignment="Right" />
+    </StackPanel>
+</UserControl>

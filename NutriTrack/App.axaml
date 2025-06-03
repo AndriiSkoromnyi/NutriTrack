@@ -1,0 +1,48 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="clr-namespace:NutriTrack.Views"
+             xmlns:viewModels="clr-namespace:NutriTrack.ViewModels"
+             xmlns:converters="clr-namespace:NutriTrack.Converters"
+             x:Class="NutriTrack.App"
+             RequestedThemeVariant="Default">
+
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
+            <!-- DataTemplates для связывания ViewModel и View -->
+            <DataTemplate x:Key="ProductViewTemplate" DataType="{x:Type viewModels:ProductViewModel}">
+                <views:ProductView />
+            </DataTemplate>
+            <DataTemplate x:Key="MealEntryViewTemplate" DataType="{x:Type viewModels:MealEntryViewModel}">
+                <views:MealEntryView />
+            </DataTemplate>
+            <DataTemplate x:Key="DailySummaryViewTemplate" DataType="{x:Type viewModels:DailySummaryViewModel}">
+                <views:DailySummaryView />
+            </DataTemplate>
+            <DataTemplate x:Key="SettingsViewTemplate" DataType="{x:Type viewModels:SettingsViewModel}">
+                <views:SettingsView />
+            </DataTemplate>
+
+            <!-- Здесь можно добавить другие ресурсы, конвертеры и стили -->
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.DataTemplates>
+        <DataTemplate DataType="{x:Type viewModels:ProductViewModel}">
+            <views:ProductView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:MealEntryViewModel}">
+            <views:MealEntryView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:DailySummaryViewModel}">
+            <views:DailySummaryView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
+            <views:SettingsView />
+        </DataTemplate>
+    </Application.DataTemplates>
+</Application>

@@ -18,8 +18,15 @@ namespace NutriTrack.Services
 
     public class ProductService : IProductService
     {
-        private readonly string _filePath = "products.json";
+        private readonly string _filePath;
         private List<Product> _products = new List<Product>();
+
+        public ProductService()
+        {
+            var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NutriTrack");
+            Directory.CreateDirectory(appDataPath);
+            _filePath = Path.Combine(appDataPath, "products.json");
+        }
 
         public async Task<List<Product>> LoadProductsAsync()
         {

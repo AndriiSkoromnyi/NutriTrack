@@ -13,7 +13,7 @@ namespace NutriTrack.ViewModels
         private readonly IMealEntryService _mealEntryService;
         private readonly IProductService _productService;
 
-        public ObservableCollection<MealEntry> MealEntries { get; } = new ObservableCollection<MealEntry>();
+        public ObservableCollection<MealEntryDisplayModel> MealEntries { get; } = new ObservableCollection<MealEntryDisplayModel>();
         public ObservableCollection<Product> Products { get; } = new ObservableCollection<Product>();
 
         // Коллекция строковых названий MealType для ComboBox
@@ -72,13 +72,13 @@ namespace NutriTrack.ViewModels
             }
         }
 
-        private DateTimeOffset _selectedDate = DateTimeOffset.Now;
+        private DateTimeOffset _selectedDate = DateTimeOffset.Now.Date;
         public DateTimeOffset SelectedDate
         {
             get => _selectedDate;
             set
             {
-                if (SetProperty(ref _selectedDate, value))
+                if (SetProperty(ref _selectedDate, value.Date))
                 {
                     _ = LoadMealEntriesAsync();
                 }
@@ -116,8 +116,17 @@ namespace NutriTrack.ViewModels
         {
             MealEntries.Clear();
             var entries = await _mealEntryService.LoadMealEntriesAsync(SelectedDate.DateTime);
-            foreach (var e in entries)
-                MealEntries.Add(e);
+            var products = await _productService.LoadProductsAsync();
+
+            foreach (var entry in entries.OrderBy(e => e.Date))
+            {
+                var product = products.FirstOrDefault(p => p.Id == entry.ProductId);
+                if (product != null)
+                {
+                    var displayModel = new MealEntryDisplayModel(entry, product);
+                    MealEntries.Add(displayModel);
+                }
+            }
         }
 
         private async Task AddMealEntryAsync()
@@ -125,22 +134,34 @@ namespace NutriTrack.ViewModels
             if (Products.Count == 0)
                 return;
 
+            var defaultTime = MealType.Breakfast switch
+            {
+                MealType.Breakfast => new TimeSpan(8, 0, 0),
+                MealType.Lunch => new TimeSpan(13, 0, 0),
+                MealType.Dinner => new TimeSpan(19, 0, 0),
+                _ => new TimeSpan(11, 0, 0) // Snack
+            };
+
             var newEntry = new MealEntry
             {
                 ProductId = Products[0].Id,
                 Weight = 100,
                 MealType = MealType.Breakfast,
-                Date = SelectedDate
+                Date = SelectedDate.DateTime.Add(defaultTime)
             };
+
             await _mealEntryService.AddMealEntryAsync(newEntry);
-            MealEntries.Add(newEntry);
+            await LoadMealEntriesAsync();
             SelectedMealEntry = newEntry;
         }
 
         private async Task SaveMealEntryAsync()
         {
             if (SelectedMealEntry != null)
+            {
                 await _mealEntryService.UpdateMealEntryAsync(SelectedMealEntry);
+                await LoadMealEntriesAsync();
+            }
         }
 
         private async Task DeleteMealEntryAsync()
@@ -148,9 +169,28 @@ namespace NutriTrack.ViewModels
             if (SelectedMealEntry != null)
             {
                 await _mealEntryService.DeleteMealEntryAsync(SelectedMealEntry.Id);
-                MealEntries.Remove(SelectedMealEntry);
+                await LoadMealEntriesAsync();
                 SelectedMealEntry = null;
             }
         }
+    }
+
+    public class MealEntryDisplayModel
+    {
+        private readonly MealEntry _mealEntry;
+        private readonly Product _product;
+
+        public MealEntryDisplayModel(MealEntry mealEntry, Product product)
+        {
+            _mealEntry = mealEntry;
+            _product = product;
+        }
+
+        public string MealType => _mealEntry.MealType.ToString();
+        public string ProductName => _product.Name;
+        public double Weight => _mealEntry.Weight;
+        public double Calories => Math.Round(_product.CaloriesPer100g * _mealEntry.Weight / 100.0, 1);
+        public DateTime Date => _mealEntry.Date;
+        public MealEntry MealEntry => _mealEntry;
     }
 }

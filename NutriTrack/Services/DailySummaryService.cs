@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using NutriTrack.Models;
 
@@ -19,6 +20,7 @@ namespace NutriTrack.Services
     {
         private readonly string _filePath;
         private List<DailySummary> _dailySummaries = new List<DailySummary>();
+        private readonly JsonSerializerOptions _jsonOptions;
 
         public DailySummaryService()
         {
@@ -28,6 +30,12 @@ namespace NutriTrack.Services
             );
             Directory.CreateDirectory(appDataPath);
             _filePath = Path.Combine(appDataPath, "dailySummaries.json");
+
+            _jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters = { new DateTimeJsonConverter() }
+            };
         }
 
         public async Task<List<DailySummary>> LoadAllSummariesAsync()
@@ -40,13 +48,13 @@ namespace NutriTrack.Services
             }
 
             var json = await File.ReadAllTextAsync(_filePath);
-            _dailySummaries = JsonSerializer.Deserialize<List<DailySummary>>(json) ?? new List<DailySummary>();
+            _dailySummaries = JsonSerializer.Deserialize<List<DailySummary>>(json, _jsonOptions) ?? new List<DailySummary>();
             return _dailySummaries;
         }
 
         public async Task SaveAllSummariesAsync(List<DailySummary> summaries)
         {
-            var json = JsonSerializer.Serialize(summaries, new JsonSerializerOptions { WriteIndented = true });
+            var json = JsonSerializer.Serialize(summaries, _jsonOptions);
             await File.WriteAllTextAsync(_filePath, json);
             _dailySummaries = summaries;
         }
@@ -106,7 +114,6 @@ namespace NutriTrack.Services
                 MealEntries = entriesForDate
             };
 
-            // Optionally save summary
             await SaveDailySummaryAsync(summary);
 
             return summary;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using NutriTrack.Models;
 
@@ -21,6 +22,7 @@ namespace NutriTrack.Services
     {
         private readonly string _filePath;
         private List<MealEntry> _mealEntries = new List<MealEntry>();
+        private readonly JsonSerializerOptions _jsonOptions;
 
         public MealEntryService()
         {
@@ -30,6 +32,12 @@ namespace NutriTrack.Services
             );
             Directory.CreateDirectory(appDataPath);
             _filePath = Path.Combine(appDataPath, "mealEntries.json");
+
+            _jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters = { new DateTimeJsonConverter() }
+            };
         }
 
         public async Task<List<MealEntry>> LoadMealEntriesAsync(DateTime date)
@@ -42,18 +50,14 @@ namespace NutriTrack.Services
             }
 
             var json = await File.ReadAllTextAsync(_filePath);
-            _mealEntries = JsonSerializer.Deserialize<List<MealEntry>>(json) ?? new List<MealEntry>();
+            _mealEntries = JsonSerializer.Deserialize<List<MealEntry>>(json, _jsonOptions) ?? new List<MealEntry>();
 
             return _mealEntries.Where(e => e.Date.Date == date.Date).ToList();
         }
 
         public async Task SaveMealEntriesAsync(List<MealEntry> mealEntries)
         {
-            var json = JsonSerializer.Serialize(mealEntries, new JsonSerializerOptions 
-            { 
-                WriteIndented = true,
-                Converters = { new DateTimeOffsetJsonConverter() }
-            });
+            var json = JsonSerializer.Serialize(mealEntries, _jsonOptions);
             await File.WriteAllTextAsync(_filePath, json);
             _mealEntries = mealEntries;
         }
@@ -97,18 +101,19 @@ namespace NutriTrack.Services
             }
 
             var json = await File.ReadAllTextAsync(_filePath);
-            _mealEntries = JsonSerializer.Deserialize<List<MealEntry>>(json) ?? new List<MealEntry>();
+            _mealEntries = JsonSerializer.Deserialize<List<MealEntry>>(json, _jsonOptions) ?? new List<MealEntry>();
         }
     }
 
-    public class DateTimeOffsetJsonConverter : System.Text.Json.Serialization.JsonConverter<DateTimeOffset>
+    public class DateTimeJsonConverter : JsonConverter<DateTime>
     {
-        public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return DateTimeOffset.Parse(reader.GetString());
+            var dateString = reader.GetString();
+            return DateTime.Parse(dateString ?? DateTime.Now.ToString("O"));
         }
 
-        public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         {
             writer.WriteStringValue(value.ToString("O"));
         }

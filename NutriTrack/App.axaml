@@ -13,6 +13,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
+            <converters:DateTimeConverter x:Key="DateTimeConverter"/>
+            
             <!-- DataTemplates для связывания ViewModel и View -->
             <DataTemplate x:Key="ProductViewTemplate" DataType="{x:Type viewModels:ProductViewModel}">
                 <views:ProductView />

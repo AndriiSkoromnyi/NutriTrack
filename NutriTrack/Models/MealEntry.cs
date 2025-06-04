@@ -30,13 +30,13 @@ namespace NutriTrack.Models
 
         public MealType MealType { get; set; }
 
-        private DateTimeOffset _date;
-        public DateTimeOffset Date
+        private DateTime _date;
+        public DateTime Date
         {
             get => _date;
             set
             {
-                if (value > DateTimeOffset.Now)
+                if (value > DateTime.Now)
                     throw new ArgumentException("Дата не может быть в будущем.");
                 _date = value;
             }

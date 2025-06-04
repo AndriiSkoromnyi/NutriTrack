@@ -8,26 +8,30 @@
              x:Class="NutriTrack.Views.MealEntryView"
              x:DataType="viewModels:MealEntryViewModel">
     
-    <Grid Margin="10" RowDefinitions="Auto,*,Auto" ColumnDefinitions="*,Auto">
-        <DatePicker SelectedDate="{Binding SelectedDate, Converter={StaticResource DateTimeConverter}}" Grid.ColumnSpan="2" />
+    <Grid Margin="10" RowDefinitions="Auto,*" ColumnDefinitions="*,Auto">
+        <StackPanel Grid.ColumnSpan="2">
+            <TextBlock Text="Select Date:" Margin="0,0,0,5" />
+            <DatePicker SelectedDate="{Binding SelectedDate, Converter={StaticResource DateTimeConverter}}" />
+        </StackPanel>
         
         <ListBox ItemsSource="{Binding MealEntries}" 
                  SelectedItem="{Binding SelectedMealEntry}" 
-                 Grid.Row="1" Grid.Column="0" Margin="0,5,10,5">
+                 Grid.Row="1" Grid.Column="0" Margin="0,10,10,5">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid ColumnDefinitions="100,*,80,80,80">
                         <TextBlock Text="{Binding MealType}" Grid.Column="0" />
                         <TextBlock Text="{Binding ProductName}" Grid.Column="1" />
                         <TextBlock Text="{Binding Weight, StringFormat='{}{0}g'}" Grid.Column="2" />
-                        <TextBlock Text="{Binding Calories, StringFormat='{}{0} ккал'}" Grid.Column="3" />
+                        <TextBlock Text="{Binding Calories, StringFormat='{}{0} kcal'}" Grid.Column="3" />
                         <TextBlock Text="{Binding Date, Converter={StaticResource DateTimeConverter}, ConverterParameter='HH:mm'}" Grid.Column="4" />
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
         
-        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Spacing="5">
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,10,0,5" Spacing="5">
+            <TextBlock Text="Select Product:" Margin="0,0,0,2" />
             <ComboBox ItemsSource="{Binding Products}" 
                       SelectedItem="{Binding SelectedProduct}"
                       Width="200">
@@ -38,10 +42,11 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
             
-            <TextBox Watermark="Weight (g)" 
-                     Text="{Binding SelectedMealEntry.Weight, Mode=TwoWay}" 
+            <TextBlock Text="Weight (grams):" Margin="0,10,0,2" />
+            <TextBox Text="{Binding SelectedMealEntry.Weight, Mode=TwoWay}" 
                      Width="200"/>
             
+            <TextBlock Text="Meal Type:" Margin="0,10,0,2" />
             <ComboBox ItemsSource="{Binding MealTypeNames}" 
                       SelectedItem="{Binding SelectedMealTypeName, Mode=TwoWay}"
                       Width="200">
@@ -52,18 +57,18 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
 
-            <TextBox Watermark="Time (HH:mm)" 
-                     Text="{Binding SelectedMealEntry.Date, Converter={StaticResource DateTimeConverter}, ConverterParameter='HH:mm', Mode=TwoWay}"
+            <TextBlock Text="Time (HH:mm):" Margin="0,10,0,2" />
+            <TextBox Text="{Binding SelectedMealEntry.Date, Converter={StaticResource DateTimeConverter}, ConverterParameter='HH:mm', Mode=TwoWay}"
                      Width="200" />
-        </StackPanel>
-        
-        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" 
-                    Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-            <Button Content="Add" Command="{Binding AddMealEntryCommand}" />
-            <Button Content="Save" Command="{Binding SaveMealEntryCommand}" 
-                    IsEnabled="{Binding SelectedMealEntry, Converter={StaticResource NullToBoolConverter}}" />
-            <Button Content="Delete" Command="{Binding DeleteMealEntryCommand}" 
-                    IsEnabled="{Binding SelectedMealEntry, Converter={StaticResource NullToBoolConverter}}" />
+                     
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" 
+                        Spacing="10" Margin="0,20,0,0">
+                <Button Content="Add" Command="{Binding AddMealEntryCommand}" />
+                <Button Content="Save" Command="{Binding SaveMealEntryCommand}" 
+                        IsEnabled="{Binding SelectedMealEntry, Converter={StaticResource NullToBoolConverter}}" />
+                <Button Content="Delete" Command="{Binding DeleteMealEntryCommand}" 
+                        IsEnabled="{Binding SelectedMealEntry, Converter={StaticResource NullToBoolConverter}}" />
+            </StackPanel>
         </StackPanel>
     </Grid>
 </UserControl>

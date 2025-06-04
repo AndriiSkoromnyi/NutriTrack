@@ -42,7 +42,7 @@ namespace NutriTrack.ViewModels
             // Initialize cached ViewModels
             _productViewModel = new ProductViewModel(_productService);
             _mealEntryViewModel = new MealEntryViewModel(_mealEntryService, _productService);
-            _dailySummaryViewModel = new DailySummaryViewModel(_dailySummaryService, _mealEntryService, _productService);
+            _dailySummaryViewModel = new DailySummaryViewModel(_dailySummaryService, _mealEntryService, _productService, _userSettingsService);
             _settingsViewModel = new SettingsViewModel(_userSettingsService);
 
             ShowProductsCommand = new RelayCommand(() => CurrentViewModel = _productViewModel);

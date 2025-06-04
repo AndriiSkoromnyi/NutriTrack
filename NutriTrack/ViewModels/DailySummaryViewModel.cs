@@ -19,8 +19,8 @@ namespace NutriTrack.ViewModels
             set => SetProperty(ref _summary, value);
         }
 
-        private DateTime _selectedDate = DateTime.Today;
-        public DateTime SelectedDate
+        private DateTimeOffset _selectedDate = DateTimeOffset.Now;
+        public DateTimeOffset SelectedDate
         {
             get => _selectedDate;
             set
@@ -47,10 +47,10 @@ namespace NutriTrack.ViewModels
 
         private async Task LoadSummaryAsync()
         {
-            var mealEntries = await _mealEntryService.LoadMealEntriesAsync(SelectedDate);
+            var mealEntries = await _mealEntryService.LoadMealEntriesAsync(SelectedDate.DateTime);
             var products = await _productService.LoadProductsAsync();
 
-            Summary = await _dailySummaryService.CalculateDailySummaryAsync(SelectedDate, mealEntries, products);
+            Summary = await _dailySummaryService.CalculateDailySummaryAsync(SelectedDate.DateTime, mealEntries, products);
         }
     }
 }

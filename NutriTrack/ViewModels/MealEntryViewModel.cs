@@ -72,8 +72,8 @@ namespace NutriTrack.ViewModels
             }
         }
 
-        private DateTime _selectedDate = DateTime.Today;
-        public DateTime SelectedDate
+        private DateTimeOffset _selectedDate = DateTimeOffset.Now;
+        public DateTimeOffset SelectedDate
         {
             get => _selectedDate;
             set
@@ -115,7 +115,7 @@ namespace NutriTrack.ViewModels
         private async Task LoadMealEntriesAsync()
         {
             MealEntries.Clear();
-            var entries = await _mealEntryService.LoadMealEntriesAsync(SelectedDate);
+            var entries = await _mealEntryService.LoadMealEntriesAsync(SelectedDate.DateTime);
             foreach (var e in entries)
                 MealEntries.Add(e);
         }

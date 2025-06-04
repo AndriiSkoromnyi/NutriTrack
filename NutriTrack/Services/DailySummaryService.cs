@@ -17,8 +17,18 @@ namespace NutriTrack.Services
 
     public class DailySummaryService : IDailySummaryService
     {
-        private readonly string _filePath = "dailySummaries.json";
+        private readonly string _filePath;
         private List<DailySummary> _dailySummaries = new List<DailySummary>();
+
+        public DailySummaryService()
+        {
+            var appDataPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "NutriTrack"
+            );
+            Directory.CreateDirectory(appDataPath);
+            _filePath = Path.Combine(appDataPath, "dailySummaries.json");
+        }
 
         public async Task<List<DailySummary>> LoadAllSummariesAsync()
         {
@@ -44,7 +54,7 @@ namespace NutriTrack.Services
         public async Task<DailySummary> LoadDailySummaryAsync(DateTime date)
         {
             var allSummaries = await LoadAllSummariesAsync();
-            return allSummaries.FirstOrDefault(s => s.Date.Date == date.Date);
+            return allSummaries.FirstOrDefault(s => s.Date.Date == date.Date) ?? new DailySummary { Date = date };
         }
 
         public async Task SaveDailySummaryAsync(DailySummary summary)
@@ -88,7 +98,7 @@ namespace NutriTrack.Services
 
             var summary = new DailySummary
             {
-                Date = date.Date,
+                Date = date,
                 TotalCalories = totalCalories,
                 TotalProtein = totalProtein,
                 TotalFat = totalFat,

@@ -23,7 +23,7 @@ namespace NutriTrack.Models
             set
             {
                 if (value <= 0)
-                    throw new ArgumentException("Вес должен быть больше нуля.");
+                    throw new ArgumentException("Weight must be greater than zero.");
                 _weight = value;
             }
         }
@@ -36,8 +36,10 @@ namespace NutriTrack.Models
             get => _date;
             set
             {
-                if (value > DateTime.Now)
-                    throw new ArgumentException("Дата не может быть в будущем.");
+                // Allow dates up to the end of the current day
+                var maxDate = DateTime.Today.AddDays(1).AddSeconds(-1);
+                if (value > maxDate)
+                    throw new ArgumentException("Date cannot be in the future.");
                 _date = value;
             }
         }

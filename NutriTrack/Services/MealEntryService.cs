@@ -16,6 +16,7 @@ namespace NutriTrack.Services
         Task AddMealEntryAsync(MealEntry entry);
         Task UpdateMealEntryAsync(MealEntry entry);
         Task DeleteMealEntryAsync(Guid entryId);
+        event EventHandler MealEntriesChanged;
     }
 
     public class MealEntryService : IMealEntryService
@@ -23,6 +24,8 @@ namespace NutriTrack.Services
         private readonly string _filePath;
         private List<MealEntry> _mealEntries = new List<MealEntry>();
         private readonly JsonSerializerOptions _jsonOptions;
+
+        public event EventHandler MealEntriesChanged;
 
         public MealEntryService()
         {
@@ -60,6 +63,7 @@ namespace NutriTrack.Services
             var json = JsonSerializer.Serialize(mealEntries, _jsonOptions);
             await File.WriteAllTextAsync(_filePath, json);
             _mealEntries = mealEntries;
+            MealEntriesChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public async Task AddMealEntryAsync(MealEntry entry)
@@ -67,6 +71,7 @@ namespace NutriTrack.Services
             await LoadAllMealEntriesAsync();
             _mealEntries.Add(entry);
             await SaveMealEntriesAsync(_mealEntries);
+            MealEntriesChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public async Task UpdateMealEntryAsync(MealEntry entry)
@@ -77,6 +82,7 @@ namespace NutriTrack.Services
             {
                 _mealEntries[index] = entry;
                 await SaveMealEntriesAsync(_mealEntries);
+                MealEntriesChanged?.Invoke(this, EventArgs.Empty);
             }
             else
             {
@@ -89,6 +95,7 @@ namespace NutriTrack.Services
             await LoadAllMealEntriesAsync();
             _mealEntries.RemoveAll(e => e.Id == entryId);
             await SaveMealEntriesAsync(_mealEntries);
+            MealEntriesChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private async Task LoadAllMealEntriesAsync()

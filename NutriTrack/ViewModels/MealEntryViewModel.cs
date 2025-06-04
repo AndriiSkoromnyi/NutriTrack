@@ -13,13 +13,28 @@ namespace NutriTrack.ViewModels
         private readonly IMealEntryService _mealEntryService;
         private readonly IProductService _productService;
 
-        public ObservableCollection<MealEntryDisplayModel> MealEntries { get; } = new ObservableCollection<MealEntryDisplayModel>();
-        public ObservableCollection<Product> Products { get; } = new ObservableCollection<Product>();
+        public ObservableCollection<MealEntryDisplayModel> MealEntries { get; } = new();
+        public ObservableCollection<Product> Products { get; } = new();
 
         // Коллекция строковых названий MealType для ComboBox
-        public ObservableCollection<string> MealTypeNames { get; } = new ObservableCollection<string>(
+        public ObservableCollection<string> MealTypeNames { get; } = new(
             Enum.GetNames(typeof(MealType))
         );
+
+        private MealEntryDisplayModel _selectedMealEntryDisplay;
+        public MealEntryDisplayModel SelectedMealEntryDisplay
+        {
+            get => _selectedMealEntryDisplay;
+            set
+            {
+                if (SetProperty(ref _selectedMealEntryDisplay, value))
+                {
+                    SelectedMealEntry = value?.MealEntry;
+                    SaveMealEntryCommand.NotifyCanExecuteChanged();
+                    DeleteMealEntryCommand.NotifyCanExecuteChanged();
+                }
+            }
+        }
 
         private MealEntry _selectedMealEntry;
         public MealEntry SelectedMealEntry
@@ -49,9 +64,10 @@ namespace NutriTrack.ViewModels
             get => _selectedProduct;
             set
             {
-                if (SetProperty(ref _selectedProduct, value) && SelectedMealEntry != null && value != null)
+                if (SetProperty(ref _selectedProduct, value))
                 {
-                    SelectedMealEntry.ProductId = value.Id;
+                    AddMealEntryCommand.NotifyCanExecuteChanged();
+                    SaveMealEntryCommand.NotifyCanExecuteChanged();
                 }
             }
         }
@@ -62,23 +78,20 @@ namespace NutriTrack.ViewModels
             get => _selectedMealTypeName;
             set
             {
-                if (SetProperty(ref _selectedMealTypeName, value) && SelectedMealEntry != null)
+                if (SetProperty(ref _selectedMealTypeName, value))
                 {
-                    if (Enum.TryParse<MealType>(value, out var parsed))
-                    {
-                        SelectedMealEntry.MealType = parsed;
-                    }
+                    AddMealEntryCommand.NotifyCanExecuteChanged();
                 }
             }
         }
 
-        private DateTimeOffset _selectedDate = DateTimeOffset.Now.Date;
+        private DateTimeOffset _selectedDate = DateTimeOffset.Now;
         public DateTimeOffset SelectedDate
         {
             get => _selectedDate;
             set
             {
-                if (SetProperty(ref _selectedDate, value.Date))
+                if (SetProperty(ref _selectedDate, value))
                 {
                     _ = LoadMealEntriesAsync();
                 }
@@ -96,20 +109,50 @@ namespace NutriTrack.ViewModels
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
 
             LoadMealEntriesCommand = new AsyncRelayCommand(LoadMealEntriesAsync);
-            AddMealEntryCommand = new AsyncRelayCommand(AddMealEntryAsync);
-            SaveMealEntryCommand = new AsyncRelayCommand(SaveMealEntryAsync);
-            DeleteMealEntryCommand = new AsyncRelayCommand(DeleteMealEntryAsync);
+            AddMealEntryCommand = new AsyncRelayCommand(AddMealEntryAsync, CanAddMealEntry);
+            SaveMealEntryCommand = new AsyncRelayCommand(SaveMealEntryAsync, CanSaveMealEntry);
+            DeleteMealEntryCommand = new AsyncRelayCommand(DeleteMealEntryAsync, CanDeleteMealEntry);
 
-            _ = LoadProductsAsync();
-            _ = LoadMealEntriesAsync();
+            _productService.ProductsChanged += async (s, e) => await LoadProductsAndRefreshEntriesAsync();
+            
+            _ = LoadProductsAndRefreshEntriesAsync();
+        }
+
+        private bool CanAddMealEntry()
+        {
+            return SelectedProduct != null && !string.IsNullOrEmpty(SelectedMealTypeName);
+        }
+
+        private bool CanSaveMealEntry()
+        {
+            return SelectedMealEntryDisplay != null && SelectedProduct != null;
+        }
+
+        private bool CanDeleteMealEntry()
+        {
+            return SelectedMealEntryDisplay != null;
+        }
+
+        private async Task LoadProductsAndRefreshEntriesAsync()
+        {
+            await LoadProductsAsync();
+            await LoadMealEntriesAsync();
         }
 
         private async Task LoadProductsAsync()
         {
             Products.Clear();
             var products = await _productService.LoadProductsAsync();
-            foreach (var p in products)
-                Products.Add(p);
+            foreach (var product in products)
+            {
+                Products.Add(product);
+            }
+
+            // Если выбранный продукт был удален, очищаем выбор
+            if (SelectedProduct != null && !products.Any(p => p.Id == SelectedProduct.Id))
+            {
+                SelectedProduct = null;
+            }
         }
 
         private async Task LoadMealEntriesAsync()
@@ -121,7 +164,7 @@ namespace NutriTrack.ViewModels
             foreach (var entry in entries.OrderBy(e => e.Date))
             {
                 var product = products.FirstOrDefault(p => p.Id == entry.ProductId);
-                if (product != null)
+                if (product != null) // Показываем только записи с существующими продуктами
                 {
                     var displayModel = new MealEntryDisplayModel(entry, product);
                     MealEntries.Add(displayModel);
@@ -131,23 +174,24 @@ namespace NutriTrack.ViewModels
 
         private async Task AddMealEntryAsync()
         {
-            if (Products.Count == 0)
+            if (!CanAddMealEntry())
                 return;
 
-            var defaultTime = MealType.Breakfast switch
+            var currentTime = DateTime.Now.TimeOfDay;
+            var selectedDateTime = SelectedDate.DateTime.Date.Add(currentTime);
+            
+            // If the resulting date time would be in the future, use the selected date with current time
+            if (selectedDateTime > DateTime.Now)
             {
-                MealType.Breakfast => new TimeSpan(8, 0, 0),
-                MealType.Lunch => new TimeSpan(13, 0, 0),
-                MealType.Dinner => new TimeSpan(19, 0, 0),
-                _ => new TimeSpan(11, 0, 0) // Snack
-            };
+                selectedDateTime = SelectedDate.DateTime.Date;
+            }
 
             var newEntry = new MealEntry
             {
-                ProductId = Products[0].Id,
-                Weight = 100,
-                MealType = MealType.Breakfast,
-                Date = SelectedDate.DateTime.Add(defaultTime)
+                ProductId = SelectedProduct.Id,
+                Weight = 100, // Можно добавить свойство для веса по умолчанию
+                MealType = Enum.Parse<MealType>(SelectedMealTypeName),
+                Date = selectedDateTime
             };
 
             await _mealEntryService.AddMealEntryAsync(newEntry);
@@ -157,21 +201,28 @@ namespace NutriTrack.ViewModels
 
         private async Task SaveMealEntryAsync()
         {
-            if (SelectedMealEntry != null)
+            if (!CanSaveMealEntry())
+                return;
+
+            SelectedMealEntry.ProductId = SelectedProduct.Id;
+            if (Enum.TryParse<MealType>(SelectedMealTypeName, out var mealType))
             {
-                await _mealEntryService.UpdateMealEntryAsync(SelectedMealEntry);
-                await LoadMealEntriesAsync();
+                SelectedMealEntry.MealType = mealType;
             }
+
+            await _mealEntryService.UpdateMealEntryAsync(SelectedMealEntry);
+            await LoadMealEntriesAsync();
         }
 
         private async Task DeleteMealEntryAsync()
         {
-            if (SelectedMealEntry != null)
-            {
-                await _mealEntryService.DeleteMealEntryAsync(SelectedMealEntry.Id);
-                await LoadMealEntriesAsync();
-                SelectedMealEntry = null;
-            }
+            if (!CanDeleteMealEntry())
+                return;
+
+            await _mealEntryService.DeleteMealEntryAsync(SelectedMealEntryDisplay.MealEntry.Id);
+            await LoadMealEntriesAsync();
+            SelectedMealEntry = null;
+            SelectedMealEntryDisplay = null;
         }
     }
 

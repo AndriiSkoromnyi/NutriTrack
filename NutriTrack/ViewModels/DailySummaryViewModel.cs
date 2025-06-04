@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using NutriTrack.Models;
 using NutriTrack.Services;
 using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace NutriTrack.ViewModels
 {
@@ -30,6 +32,8 @@ namespace NutriTrack.ViewModels
             }
         }
 
+        public ObservableCollection<MealEntryDisplayModel> MealEntries { get; } = new();
+
         public IAsyncRelayCommand LoadSummaryCommand { get; }
 
         public DailySummaryViewModel(IDailySummaryService dailySummaryService,
@@ -42,6 +46,10 @@ namespace NutriTrack.ViewModels
 
             LoadSummaryCommand = new AsyncRelayCommand(LoadSummaryAsync);
 
+            // Подписываемся на события изменения данных
+            _mealEntryService.MealEntriesChanged += async (s, e) => await LoadSummaryAsync();
+            _productService.ProductsChanged += async (s, e) => await LoadSummaryAsync();
+
             _ = LoadSummaryAsync();
         }
 
@@ -50,7 +58,20 @@ namespace NutriTrack.ViewModels
             var mealEntries = await _mealEntryService.LoadMealEntriesAsync(SelectedDate.DateTime);
             var products = await _productService.LoadProductsAsync();
 
-            Summary = await _dailySummaryService.CalculateDailySummaryAsync(SelectedDate.DateTime, mealEntries, products);
+            // Фильтруем записи, оставляя только те, у которых есть существующие продукты
+            var validMealEntries = mealEntries
+                .Where(entry => products.Any(p => p.Id == entry.ProductId))
+                .ToList();
+
+            Summary = await _dailySummaryService.CalculateDailySummaryAsync(SelectedDate.DateTime, validMealEntries, products);
+            
+            // Обновляем отображаемые записи
+            MealEntries.Clear();
+            foreach (var entry in validMealEntries.OrderBy(e => e.Date))
+            {
+                var product = products.First(p => p.Id == entry.ProductId);
+                MealEntries.Add(new MealEntryDisplayModel(entry, product));
+            }
         }
     }
 }

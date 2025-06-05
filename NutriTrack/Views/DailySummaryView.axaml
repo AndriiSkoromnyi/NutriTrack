@@ -17,56 +17,152 @@
             <StackPanel Grid.Column="0" Spacing="10">
                 <TextBlock Text="Daily Totals" FontWeight="Bold" FontSize="16" Margin="0,0,0,5"/>
                 
-                <Grid ColumnDefinitions="120,80">
+                <!-- Calories -->
+                <Grid ColumnDefinitions="120,*" Margin="0,0,0,15">
                     <TextBlock Text="Calories:" Grid.Column="0" FontWeight="SemiBold"/>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="5">
-                        <TextBlock Text="{Binding Summary.TotalCalories, StringFormat='{}{0}'}" />
-                        <TextBlock Text="/" Foreground="Gray"/>
-                        <TextBlock Text="{Binding UserSettings.DailyCalorieGoal}" Foreground="Gray"/>
-                        <TextBlock Text="kcal" Foreground="Gray"/>
+                    <StackPanel Grid.Column="1" Spacing="5">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <TextBlock Text="{Binding Summary.TotalCalories, StringFormat='{}{0}'}" />
+                            <TextBlock Text="/" Foreground="Gray"/>
+                            <TextBlock Text="{Binding UserSettings.DailyCalorieGoal}" Foreground="Gray"/>
+                            <TextBlock Text="kcal" Foreground="Gray"/>
+                        </StackPanel>
+                        <ProgressBar Value="{Binding CaloriesProgress}" 
+                                   Maximum="100"
+                                   Height="15"
+                                   Width="200">
+                            <ProgressBar.Styles>
+                                <Style Selector="ProgressBar">
+                                    <Style.Animations>
+                                        <Animation Duration="0:0:0.2">
+                                            <KeyFrame Cue="0%">
+                                                <Setter Property="Value" Value="0"/>
+                                            </KeyFrame>
+                                            <KeyFrame Cue="100%">
+                                                <Setter Property="Value" Value="{Binding CaloriesProgress}"/>
+                                            </KeyFrame>
+                                        </Animation>
+                                    </Style.Animations>
+                                </Style>
+                            </ProgressBar.Styles>
+                        </ProgressBar>
+                        <TextBlock Text="{Binding CaloriesStatusMessage}"
+                                 Foreground="{Binding IsCaloriesGoalMet, Converter={StaticResource BoolToColorConverter}}"
+                                 FontWeight="SemiBold"
+                                 TextWrapping="Wrap"
+                                 MaxWidth="200"/>
                     </StackPanel>
                 </Grid>
 
-                <ProgressBar Value="{Binding CaloriesProgress}" 
-                           Maximum="100"
-                           Height="15"
-                           Width="200"
-                           Margin="0,5">
-                    <ProgressBar.Styles>
-                        <Style Selector="ProgressBar">
-                            <Style.Animations>
-                                <Animation Duration="0:0:0.2">
-                                    <KeyFrame Cue="0%">
-                                        <Setter Property="Value" Value="0"/>
-                                    </KeyFrame>
-                                    <KeyFrame Cue="100%">
-                                        <Setter Property="Value" Value="{Binding CaloriesProgress}"/>
-                                    </KeyFrame>
-                                </Animation>
-                            </Style.Animations>
-                        </Style>
-                    </ProgressBar.Styles>
-                </ProgressBar>
-
-                <TextBlock Text="{Binding CaloriesStatusMessage}"
-                         Foreground="{Binding IsCaloriesGoalMet, Converter={StaticResource BoolToColorConverter}}"
-                         FontWeight="SemiBold"
-                         TextWrapping="Wrap"
-                         MaxWidth="200"/>
-
-                <Grid ColumnDefinitions="120,80">
+                <!-- Protein -->
+                <Grid ColumnDefinitions="120,*" Margin="0,0,0,15">
                     <TextBlock Text="Protein:" Grid.Column="0" FontWeight="SemiBold"/>
-                    <TextBlock Text="{Binding Summary.TotalProtein, StringFormat='{}{0}g'}" Grid.Column="1"/>
+                    <StackPanel Grid.Column="1" Spacing="5">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <TextBlock Text="{Binding Summary.TotalProtein, StringFormat='{}{0}'}" />
+                            <TextBlock Text="/" Foreground="Gray"/>
+                            <TextBlock Text="{Binding UserSettings.DailyProteinGoal}" Foreground="Gray"/>
+                            <TextBlock Text="g" Foreground="Gray"/>
+                        </StackPanel>
+                        <ProgressBar Value="{Binding ProteinProgress}" 
+                                   Maximum="100"
+                                   Height="15"
+                                   Width="200">
+                            <ProgressBar.Styles>
+                                <Style Selector="ProgressBar">
+                                    <Style.Animations>
+                                        <Animation Duration="0:0:0.2">
+                                            <KeyFrame Cue="0%">
+                                                <Setter Property="Value" Value="0"/>
+                                            </KeyFrame>
+                                            <KeyFrame Cue="100%">
+                                                <Setter Property="Value" Value="{Binding ProteinProgress}"/>
+                                            </KeyFrame>
+                                        </Animation>
+                                    </Style.Animations>
+                                </Style>
+                            </ProgressBar.Styles>
+                        </ProgressBar>
+                        <TextBlock Text="{Binding ProteinStatusMessage}"
+                                 Foreground="{Binding IsProteinGoalMet, Converter={StaticResource BoolToColorConverter}}"
+                                 FontWeight="SemiBold"
+                                 TextWrapping="Wrap"
+                                 MaxWidth="200"/>
+                    </StackPanel>
                 </Grid>
 
-                <Grid ColumnDefinitions="120,80">
+                <!-- Fat -->
+                <Grid ColumnDefinitions="120,*" Margin="0,0,0,15">
                     <TextBlock Text="Fat:" Grid.Column="0" FontWeight="SemiBold"/>
-                    <TextBlock Text="{Binding Summary.TotalFat, StringFormat='{}{0}g'}" Grid.Column="1"/>
+                    <StackPanel Grid.Column="1" Spacing="5">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <TextBlock Text="{Binding Summary.TotalFat, StringFormat='{}{0}'}" />
+                            <TextBlock Text="/" Foreground="Gray"/>
+                            <TextBlock Text="{Binding UserSettings.DailyFatGoal}" Foreground="Gray"/>
+                            <TextBlock Text="g" Foreground="Gray"/>
+                        </StackPanel>
+                        <ProgressBar Value="{Binding FatProgress}" 
+                                   Maximum="100"
+                                   Height="15"
+                                   Width="200">
+                            <ProgressBar.Styles>
+                                <Style Selector="ProgressBar">
+                                    <Style.Animations>
+                                        <Animation Duration="0:0:0.2">
+                                            <KeyFrame Cue="0%">
+                                                <Setter Property="Value" Value="0"/>
+                                            </KeyFrame>
+                                            <KeyFrame Cue="100%">
+                                                <Setter Property="Value" Value="{Binding FatProgress}"/>
+                                            </KeyFrame>
+                                        </Animation>
+                                    </Style.Animations>
+                                </Style>
+                            </ProgressBar.Styles>
+                        </ProgressBar>
+                        <TextBlock Text="{Binding FatStatusMessage}"
+                                 Foreground="{Binding IsFatGoalMet, Converter={StaticResource BoolToColorConverter}}"
+                                 FontWeight="SemiBold"
+                                 TextWrapping="Wrap"
+                                 MaxWidth="200"/>
+                    </StackPanel>
                 </Grid>
 
-                <Grid ColumnDefinitions="120,80">
+                <!-- Carbs -->
+                <Grid ColumnDefinitions="120,*" Margin="0,0,0,15">
                     <TextBlock Text="Carbs:" Grid.Column="0" FontWeight="SemiBold"/>
-                    <TextBlock Text="{Binding Summary.TotalCarbohydrates, StringFormat='{}{0}g'}" Grid.Column="1"/>
+                    <StackPanel Grid.Column="1" Spacing="5">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <TextBlock Text="{Binding Summary.TotalCarbohydrates, StringFormat='{}{0}'}" />
+                            <TextBlock Text="/" Foreground="Gray"/>
+                            <TextBlock Text="{Binding UserSettings.DailyCarbsGoal}" Foreground="Gray"/>
+                            <TextBlock Text="g" Foreground="Gray"/>
+                        </StackPanel>
+                        <ProgressBar Value="{Binding CarbsProgress}" 
+                                   Maximum="100"
+                                   Height="15"
+                                   Width="200">
+                            <ProgressBar.Styles>
+                                <Style Selector="ProgressBar">
+                                    <Style.Animations>
+                                        <Animation Duration="0:0:0.2">
+                                            <KeyFrame Cue="0%">
+                                                <Setter Property="Value" Value="0"/>
+                                            </KeyFrame>
+                                            <KeyFrame Cue="100%">
+                                                <Setter Property="Value" Value="{Binding CarbsProgress}"/>
+                                            </KeyFrame>
+                                        </Animation>
+                                    </Style.Animations>
+                                </Style>
+                            </ProgressBar.Styles>
+                        </ProgressBar>
+                        <TextBlock Text="{Binding CarbsStatusMessage}"
+                                 Foreground="{Binding IsCarbsGoalMet, Converter={StaticResource BoolToColorConverter}}"
+                                 FontWeight="SemiBold"
+                                 TextWrapping="Wrap"
+                                 MaxWidth="200"/>
+                    </StackPanel>
                 </Grid>
             </StackPanel>
         </Grid>

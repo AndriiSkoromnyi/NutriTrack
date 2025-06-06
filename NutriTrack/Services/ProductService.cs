@@ -61,14 +61,14 @@ namespace NutriTrack.Services
 
         public async Task AddProductAsync(Product product)
         {
-            await LoadProductsAsync(); // Загружаем актуальный список перед добавлением
+            await LoadProductsAsync(); 
             _products.Add(product);
             await SaveProductsAsync(_products);
         }
 
         public async Task UpdateProductAsync(Product product)
         {
-            await LoadProductsAsync(); // Загружаем актуальный список перед обновлением
+            await LoadProductsAsync(); 
             var index = _products.FindIndex(p => p.Id == product.Id);
             if (index >= 0)
             {
@@ -83,7 +83,7 @@ namespace NutriTrack.Services
 
         public async Task DeleteProductAsync(Guid productId)
         {
-            await LoadProductsAsync(); // Загружаем актуальный список перед удалением
+            await LoadProductsAsync(); 
             _products.RemoveAll(p => p.Id == productId);
             await SaveProductsAsync(_products);
         }

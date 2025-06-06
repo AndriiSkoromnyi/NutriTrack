@@ -20,7 +20,6 @@ namespace NutriTrack.ViewModels
             set => SetProperty(ref _settings, value);
         }
 
-        // Коллекция для ComboBox с элементами enum WeightUnit
         public ObservableCollection<WeightUnit> WeightUnits { get; }
 
         public IAsyncRelayCommand LoadSettingsCommand { get; }
@@ -29,15 +28,13 @@ namespace NutriTrack.ViewModels
         public SettingsViewModel(IUserSettingsService userSettingsService)
         {
             _userSettingsService = userSettingsService ?? throw new ArgumentNullException(nameof(userSettingsService));
-
-            // Инициализируем коллекцию enum значений
+            
             WeightUnits = new ObservableCollection<WeightUnit>(
                 Enum.GetValues(typeof(WeightUnit)).Cast<WeightUnit>());
 
             LoadSettingsCommand = new AsyncRelayCommand(LoadSettingsAsync);
             SaveSettingsCommand = new AsyncRelayCommand(SaveSettingsAsync);
-
-            // Загружаем настройки при создании ViewModel
+            
             _ = LoadSettingsAsync();
         }
 
@@ -50,7 +47,6 @@ namespace NutriTrack.ViewModels
             }
             else
             {
-                // Если настроек нет, создаем дефолтные
                 Settings = new UserSettings
                 {
                     DailyCalorieGoal = 2000,

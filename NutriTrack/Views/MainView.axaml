@@ -5,18 +5,154 @@
         xmlns:vm="clr-namespace:NutriTrack.ViewModels"
         mc:Ignorable="d"
         x:Class="NutriTrack.Views.MainView"
-        Width="800" Height="600"
+        Width="1000" Height="700"
         Title="NutriTrack - Nutrition Diary"
-        x:DataType="vm:MainViewModel">
+        x:DataType="vm:MainViewModel"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True">
 
-    <DockPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10" Spacing="10">
-            <Button Content="Products" Command="{Binding ShowProductsCommand}" />
-            <Button Content="Meal Entries" Command="{Binding ShowMealEntriesCommand}" />
-            <Button Content="Daily Summary" Command="{Binding ShowDailySummaryCommand}" />
-            <Button Content="Settings" Command="{Binding ShowSettingsCommand}" />
-        </StackPanel>
+    <Window.Styles>
+        <Style Selector="Button.nav">
+            <Setter Property="Background" Value="#0078D4"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
         
-        <ContentControl Content="{Binding CurrentViewModel}" />
-    </DockPanel>
+        <Style Selector="Button.nav:pointerover">
+            <Setter Property="Background" Value="#106EBE"/>
+        </Style>
+
+        <Style Selector="TextBlock.title">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#000000"/>
+        </Style>
+
+        <Style Selector="TextBlock.label">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Foreground" Value="#000000"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="#000000"/>
+        </Style>
+
+        <Style Selector="Button.add">
+            <Setter Property="Background" Value="#107C10"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,4"/>
+        </Style>
+
+        <Style Selector="Button.add:pointerover">
+            <Setter Property="Background" Value="#0B590B"/>
+        </Style>
+
+        <Style Selector="Button.save">
+            <Setter Property="Background" Value="#0078D4"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,4"/>
+        </Style>
+
+        <Style Selector="Button.save:pointerover">
+            <Setter Property="Background" Value="#106EBE"/>
+        </Style>
+
+        <Style Selector="Button.delete">
+            <Setter Property="Background" Value="#D83B01"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,4"/>
+        </Style>
+
+        <Style Selector="Button.delete:pointerover">
+            <Setter Property="Background" Value="#A62E01"/>
+        </Style>
+
+        <Style Selector="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#000000"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#CCCCCC"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+
+        <Style Selector="ComboBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#000000"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#CCCCCC"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+    </Window.Styles>
+
+    <Panel>
+        <ExperimentalAcrylicBorder IsHitTestVisible="False">
+            <ExperimentalAcrylicBorder.Material>
+                <ExperimentalAcrylicMaterial
+                    BackgroundSource="Digger"
+                    TintColor="White"
+                    TintOpacity="1"
+                    MaterialOpacity="0.65" />
+            </ExperimentalAcrylicBorder.Material>
+        </ExperimentalAcrylicBorder>
+
+        <DockPanel Margin="0,30,0,0">
+            <Border DockPanel.Dock="Top" 
+                    Background="#ffffff" 
+                    BoxShadow="0 1 3 0 #20000000"
+                    Padding="20">
+                <Grid ColumnDefinitions="Auto,*">
+                    <StackPanel Grid.Column="0" 
+                                Orientation="Horizontal" 
+                                Spacing="16" 
+                                VerticalAlignment="Center">
+                        <TextBlock Text="NutriTrack" 
+                                   Classes="title"/>
+                        <Button Content="Products" 
+                                Classes="nav"
+                                Command="{Binding ShowProductsCommand}"/>
+                        <Button Content="Meal Entries" 
+                                Classes="nav"
+                                Command="{Binding ShowMealEntriesCommand}"/>
+                        <Button Content="Daily Summary" 
+                                Classes="nav"
+                                Command="{Binding ShowDailySummaryCommand}"/>
+                        <Button Content="Settings" 
+                                Classes="nav"
+                                Command="{Binding ShowSettingsCommand}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <TransitioningContentControl Content="{Binding CurrentViewModel}"
+                                         Background="#f5f5f5">
+                <TransitioningContentControl.PageTransition>
+                    <CrossFade Duration="0.25"/>
+                </TransitioningContentControl.PageTransition>
+            </TransitioningContentControl>
+        </DockPanel>
+    </Panel>
 </Window>

@@ -15,8 +15,7 @@ namespace NutriTrack.ViewModels
 
         public ObservableCollection<MealEntryDisplayModel> MealEntries { get; } = new();
         public ObservableCollection<Product> Products { get; } = new();
-
-        // Коллекция строковых названий MealType для ComboBox
+        
         public ObservableCollection<string> MealTypeNames { get; } = new(
             Enum.GetNames(typeof(MealType))
         );
@@ -30,6 +29,10 @@ namespace NutriTrack.ViewModels
                 if (SetProperty(ref _selectedMealEntryDisplay, value))
                 {
                     SelectedMealEntry = value?.MealEntry;
+                    if (value?.MealEntry != null)
+                    {
+                        TimeString = value.MealEntry.Date.ToString("HH:mm");
+                    }
                     SaveMealEntryCommand.NotifyCanExecuteChanged();
                     DeleteMealEntryCommand.NotifyCanExecuteChanged();
                 }
@@ -48,11 +51,13 @@ namespace NutriTrack.ViewModels
                     {
                         SelectedProduct = Products.FirstOrDefault(p => p.Id == value.ProductId);
                         SelectedMealTypeName = value.MealType.ToString();
+                        TimeString = value.Date.ToString("HH:mm");
                     }
                     else
                     {
                         SelectedProduct = null;
                         SelectedMealTypeName = null;
+                        TimeString = DateTime.Now.ToString("HH:mm");
                     }
                 }
             }
@@ -96,6 +101,22 @@ namespace NutriTrack.ViewModels
                     _ = LoadMealEntriesAsync();
                 }
             }
+        }
+
+        private string _timeString = DateTime.Now.ToString("HH:mm");
+        public string TimeString
+        {
+            get => _timeString;
+            set => SetProperty(ref _timeString, value);
+        }
+
+        private TimeSpan ParseTimeString(string timeString)
+        {
+            if (TimeSpan.TryParse(timeString, out TimeSpan result))
+            {
+                return result;
+            }
+            return DateTime.Now.TimeOfDay;
         }
 
         public IAsyncRelayCommand LoadMealEntriesCommand { get; }
@@ -147,8 +168,7 @@ namespace NutriTrack.ViewModels
             {
                 Products.Add(product);
             }
-
-            // Если выбранный продукт был удален, очищаем выбор
+            
             if (SelectedProduct != null && !products.Any(p => p.Id == SelectedProduct.Id))
             {
                 SelectedProduct = null;
@@ -164,7 +184,7 @@ namespace NutriTrack.ViewModels
             foreach (var entry in entries.OrderBy(e => e.Date))
             {
                 var product = products.FirstOrDefault(p => p.Id == entry.ProductId);
-                if (product != null) // Показываем только записи с существующими продуктами
+                if (product != null) 
                 {
                     var displayModel = new MealEntryDisplayModel(entry, product);
                     MealEntries.Add(displayModel);
@@ -177,19 +197,13 @@ namespace NutriTrack.ViewModels
             if (!CanAddMealEntry())
                 return;
 
-            var currentTime = DateTime.Now.TimeOfDay;
-            var selectedDateTime = SelectedDate.DateTime.Date.Add(currentTime);
-            
-            // If the resulting date time would be in the future, use the selected date with current time
-            if (selectedDateTime > DateTime.Now)
-            {
-                selectedDateTime = SelectedDate.DateTime.Date;
-            }
+            var time = ParseTimeString(TimeString);
+            var selectedDateTime = SelectedDate.DateTime.Date.Add(time);
 
             var newEntry = new MealEntry
             {
                 ProductId = SelectedProduct.Id,
-                Weight = 100, // Можно добавить свойство для веса по умолчанию
+                Weight = 100, 
                 MealType = Enum.Parse<MealType>(SelectedMealTypeName),
                 Date = selectedDateTime
             };
@@ -209,6 +223,10 @@ namespace NutriTrack.ViewModels
             {
                 SelectedMealEntry.MealType = mealType;
             }
+            
+            var time = ParseTimeString(TimeString);
+            var newDateTime = SelectedMealEntry.Date.Date.Add(time);
+            SelectedMealEntry.Date = newDateTime;
 
             await _mealEntryService.UpdateMealEntryAsync(SelectedMealEntry);
             await LoadMealEntriesAsync();

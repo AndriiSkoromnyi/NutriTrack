@@ -197,8 +197,7 @@ namespace NutriTrack.ViewModels
             _userSettingsService = userSettingsService;
 
             LoadSummaryCommand = new AsyncRelayCommand(LoadSummaryAsync);
-
-            // Подписываемся на события изменения данных
+            
             _mealEntryService.MealEntriesChanged += async (s, e) => await LoadSummaryAsync();
             _productService.ProductsChanged += async (s, e) => await LoadSummaryAsync();
             _userSettingsService.SettingsChanged += async (s, e) => await LoadUserSettingsAsync();
@@ -210,7 +209,6 @@ namespace NutriTrack.ViewModels
         private async Task LoadUserSettingsAsync()
         {
             UserSettings = await _userSettingsService.LoadSettingsAsync();
-            // Обновляем сообщения после загрузки настроек
             OnPropertyChanged(nameof(CaloriesProgress));
             OnPropertyChanged(nameof(RemainingCalories));
             OnPropertyChanged(nameof(IsCaloriesGoalMet));
@@ -233,15 +231,13 @@ namespace NutriTrack.ViewModels
         {
             var mealEntries = await _mealEntryService.LoadMealEntriesAsync(SelectedDate.DateTime);
             var products = await _productService.LoadProductsAsync();
-
-            // Фильтруем записи, оставляя только те, у которых есть существующие продукты
+            
             var validMealEntries = mealEntries
                 .Where(entry => products.Any(p => p.Id == entry.ProductId))
                 .ToList();
 
             Summary = await _dailySummaryService.CalculateDailySummaryAsync(SelectedDate.DateTime, validMealEntries, products);
             
-            // Обновляем отображаемые записи
             MealEntries.Clear();
             foreach (var entry in validMealEntries.OrderBy(e => e.Date))
             {

@@ -6,40 +6,169 @@
              xmlns:viewModels="clr-namespace:NutriTrack.ViewModels"
              mc:Ignorable="d"
              x:Class="NutriTrack.Views.ProductView"
-             x:DataType="viewModels:ProductViewModel">
+             x:DataType="viewModels:ProductViewModel"
+             Background="#f5f5f5">
 
-    <Grid RowDefinitions="Auto,*" Margin="10" ColumnDefinitions="*,Auto">
-        <ListBox ItemsSource="{Binding Products}" 
-                 SelectedItem="{Binding SelectedProduct}" 
-                 Grid.RowSpan="2" Grid.Column="0" Margin="0,0,10,0">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}" />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+    <Grid RowDefinitions="*" ColumnDefinitions="400,*" Margin="20">
+        <Border Grid.Column="0" 
+                Background="White" 
+                CornerRadius="8"
+                BoxShadow="0 2 4 0 #20000000">
+            
+            <DockPanel Margin="16">
+                <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Products"
+                                 FontSize="20"
+                                 FontWeight="Bold"/>
+                        <Button Grid.Column="1"
+                                Command="{Binding AddProductCommand}"
+                                Classes="accent"
+                                Content="Add Product"/>
+                    </Grid>
+                    <TextBlock Text="Select a product to edit its details"
+                             Foreground="#666666"
+                             FontSize="12"
+                             Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <ListBox ItemsSource="{Binding Products}" 
+                        SelectedItem="{Binding SelectedProduct}"
+                        Background="Transparent">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#f8f9fa"
+                                    CornerRadius="4"
+                                    Padding="12"
+                                    Margin="0,4">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding Name}"
+                                                 FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding CaloriesPer100g, StringFormat='{}{0} kcal per 100g'}"
+                                                 Foreground="#666666"
+                                                 FontSize="12"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
         
-        <StackPanel Grid.Column="1" Grid.Row="0" Spacing="5">
-            <TextBlock Text="Product Details" FontWeight="Bold" />
-            <TextBlock Text="Product Name:" />
-            <TextBox Text="{Binding SelectedProduct.Name, Mode=TwoWay}" />
-            <TextBlock Text="Calories (per 100g):" />
-            <TextBox Text="{Binding SelectedProduct.CaloriesPer100g, Mode=TwoWay}" />
-            <TextBlock Text="Protein (g):" />
-            <TextBox Text="{Binding SelectedProduct.Protein, Mode=TwoWay}" />
-            <TextBlock Text="Fat (g):" />
-            <TextBox Text="{Binding SelectedProduct.Fat, Mode=TwoWay}" />
-            <TextBlock Text="Carbohydrates (g):" />
-            <TextBox Text="{Binding SelectedProduct.Carbohydrates, Mode=TwoWay}" />
-        </StackPanel>
-        
-        <StackPanel Grid.Column="1" Grid.Row="1" 
-                    Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-            <Button Content="Add" Command="{Binding AddProductCommand}" />
-            <Button Content="Save" Command="{Binding SaveProductCommand}" 
-                    IsEnabled="{Binding SelectedProduct, Converter={StaticResource NullToBoolConverter}}" />
-            <Button Content="Delete" Command="{Binding DeleteProductCommand}" 
-                    IsEnabled="{Binding SelectedProduct, Converter={StaticResource NullToBoolConverter}}" />
-        </StackPanel>
+        <Border Grid.Column="1" 
+                Background="White" 
+                CornerRadius="8"
+                Margin="20,0,0,0"
+                BoxShadow="0 2 4 0 #20000000">
+            
+            <Grid RowDefinitions="Auto,*,Auto" 
+                  Margin="24" 
+                  IsVisible="{Binding SelectedProduct, Converter={StaticResource NullToBoolConverter}}">
+                
+                <StackPanel Grid.Row="0" Spacing="4">
+                    <TextBlock Text="Edit Product"
+                             FontSize="20"
+                             FontWeight="Bold"/>
+                    <TextBlock Text="Update the product details below"
+                             Foreground="#666666"
+                             FontSize="12"
+                             Margin="0,0,0,16"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Spacing="16">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Product Name"/>
+                        <TextBox Text="{Binding SelectedProduct.Name, Mode=TwoWay}"/>
+                    </StackPanel>
+                    
+                    <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto" Margin="0,8">
+                        <Border Grid.Column="0" 
+                                Background="#e3f2fd"
+                                CornerRadius="8"
+                                Padding="16,12"
+                                Margin="0,0,8,0">
+                            <StackPanel>
+                                <TextBlock Text="Calories"
+                                         FontWeight="SemiBold"
+                                         Foreground="#1976d2"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <TextBox Text="{Binding SelectedProduct.CaloriesPer100g, Mode=TwoWay}"
+                                           Width="80"/>
+                                    <TextBlock Text="kcal"
+                                             VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Grid.Column="1" 
+                                Background="#e8f5e9"
+                                CornerRadius="8"
+                                Padding="16,12"
+                                Margin="8,0">
+                            <StackPanel>
+                                <TextBlock Text="Protein"
+                                         FontWeight="SemiBold"
+                                         Foreground="#2e7d32"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <TextBox Text="{Binding SelectedProduct.Protein, Mode=TwoWay}"
+                                           Width="80"/>
+                                    <TextBlock Text="g"
+                                             VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Grid.Column="2" 
+                                Background="#fff3e0"
+                                CornerRadius="8"
+                                Padding="16,12"
+                                Margin="8,0">
+                            <StackPanel>
+                                <TextBlock Text="Fat"
+                                         FontWeight="SemiBold"
+                                         Foreground="#f57c00"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <TextBox Text="{Binding SelectedProduct.Fat, Mode=TwoWay}"
+                                           Width="80"/>
+                                    <TextBlock Text="g"
+                                             VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Grid.Column="3" 
+                                Background="#f3e5f5"
+                                CornerRadius="8"
+                                Padding="16,12"
+                                Margin="8,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="Carbs"
+                                         FontWeight="SemiBold"
+                                         Foreground="#9c27b0"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <TextBox Text="{Binding SelectedProduct.Carbohydrates, Mode=TwoWay}"
+                                           Width="80"/>
+                                    <TextBlock Text="g"
+                                             VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+                
+                <StackPanel Grid.Row="2" 
+                          Orientation="Horizontal" 
+                          HorizontalAlignment="Right"
+                          Spacing="8">
+                    <Button Content="Delete"
+                            Command="{Binding DeleteProductCommand}"/>
+                    <Button Content="Save"
+                            Command="{Binding SaveProductCommand}"
+                            Classes="accent"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>

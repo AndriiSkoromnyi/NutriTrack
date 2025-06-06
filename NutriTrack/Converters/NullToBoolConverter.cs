@@ -11,8 +11,7 @@ namespace NutriTrack.Converters
         {
             return value != null;
         }
-
-        // Обратное преобразование не требуется
+        
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();

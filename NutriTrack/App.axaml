@@ -4,10 +4,11 @@
              xmlns:viewModels="clr-namespace:NutriTrack.ViewModels"
              xmlns:converters="clr-namespace:NutriTrack.Converters"
              x:Class="NutriTrack.App"
-             RequestedThemeVariant="Default">
+             RequestedThemeVariant="Light">
 
     <Application.Styles>
         <FluentTheme />
+        <StyleInclude Source="/Styles/DatePickerStyles.axaml"/>
     </Application.Styles>
 
     <Application.Resources>
@@ -31,6 +32,7 @@
             </DataTemplate>
 
             <!-- Здесь можно добавить другие ресурсы, конвертеры и стили -->
+            <StreamGeometry x:Key="delete_regular">M18.444 3.5v1.5h-12v-1.5h2.988l.75-.75h4.524l.75.75h2.988zm-11.25 3h10.5l-.75 12h-9l-.75-12z</StreamGeometry>
         </ResourceDictionary>
     </Application.Resources>
 

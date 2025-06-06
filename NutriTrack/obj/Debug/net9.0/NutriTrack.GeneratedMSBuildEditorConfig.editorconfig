@@ -24,6 +24,9 @@ build_property.EnableCodeStyleSeverity =
 [C:/Users/krend/RiderProjects/NutriTrack/NutriTrack/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[C:/Users/krend/RiderProjects/NutriTrack/NutriTrack/Styles/DatePickerStyles.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [C:/Users/krend/RiderProjects/NutriTrack/NutriTrack/Views/DailySummaryView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 

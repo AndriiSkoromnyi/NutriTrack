@@ -157,7 +157,7 @@
 
                     <TextBlock Text="Weight (grams):"
                                Margin="0,0,0,4"/>
-                    <NumericUpDown Value="{Binding SelectedMealEntry.Weight}"
+                    <NumericUpDown Value="{Binding Weight}"
                                    Minimum="0"
                                    Maximum="2000"
                                    Increment="10"

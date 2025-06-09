@@ -12,7 +12,8 @@ namespace NutriTrack.Views
                 new Services.ProductService(),
                 new Services.MealEntryService(),
                 new Services.DailySummaryService(),
-                new Services.UserSettingsService());
+                new Services.UserSettingsService(),
+                new Services.WeightConversionService());
         }
     }
 }

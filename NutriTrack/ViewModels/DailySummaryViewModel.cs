@@ -14,6 +14,7 @@ namespace NutriTrack.ViewModels
         private readonly IMealEntryService _mealEntryService;
         private readonly IProductService _productService;
         private readonly IUserSettingsService _userSettingsService;
+        private readonly IWeightConversionService _weightConversionService;
 
         private DailySummary _summary;
         public DailySummary Summary
@@ -70,6 +71,10 @@ namespace NutriTrack.ViewModels
                 }
             }
         }
+
+        private WeightUnit _currentWeightUnit = WeightUnit.Grams;
+        
+        public string WeightUnitDisplay => _currentWeightUnit == WeightUnit.Grams ? "g" : "oz";
 
         public double CaloriesProgress => UserSettings?.DailyCalorieGoal > 0 
             ? (Summary?.TotalCalories ?? 0) / UserSettings.DailyCalorieGoal * 100 
@@ -186,15 +191,18 @@ namespace NutriTrack.ViewModels
 
         public IAsyncRelayCommand LoadSummaryCommand { get; }
 
-        public DailySummaryViewModel(IDailySummaryService dailySummaryService,
+        public DailySummaryViewModel(
+            IDailySummaryService dailySummaryService,
             IMealEntryService mealEntryService,
             IProductService productService,
-            IUserSettingsService userSettingsService)
+            IUserSettingsService userSettingsService,
+            IWeightConversionService weightConversionService)
         {
             _dailySummaryService = dailySummaryService;
             _mealEntryService = mealEntryService;
             _productService = productService;
             _userSettingsService = userSettingsService;
+            _weightConversionService = weightConversionService;
 
             LoadSummaryCommand = new AsyncRelayCommand(LoadSummaryAsync);
             
@@ -208,23 +216,16 @@ namespace NutriTrack.ViewModels
 
         private async Task LoadUserSettingsAsync()
         {
-            UserSettings = await _userSettingsService.LoadSettingsAsync();
-            OnPropertyChanged(nameof(CaloriesProgress));
-            OnPropertyChanged(nameof(RemainingCalories));
-            OnPropertyChanged(nameof(IsCaloriesGoalMet));
-            OnPropertyChanged(nameof(CaloriesStatusMessage));
-            OnPropertyChanged(nameof(ProteinProgress));
-            OnPropertyChanged(nameof(RemainingProtein));
-            OnPropertyChanged(nameof(IsProteinGoalMet));
-            OnPropertyChanged(nameof(ProteinStatusMessage));
-            OnPropertyChanged(nameof(FatProgress));
-            OnPropertyChanged(nameof(RemainingFat));
-            OnPropertyChanged(nameof(IsFatGoalMet));
-            OnPropertyChanged(nameof(FatStatusMessage));
-            OnPropertyChanged(nameof(CarbsProgress));
-            OnPropertyChanged(nameof(RemainingCarbs));
-            OnPropertyChanged(nameof(IsCarbsGoalMet));
-            OnPropertyChanged(nameof(CarbsStatusMessage));
+            var settings = await _userSettingsService.LoadSettingsAsync();
+            if (settings != null)
+            {
+                UserSettings = settings;
+                if (settings.WeightUnit != _currentWeightUnit)
+                {
+                    _currentWeightUnit = settings.WeightUnit;
+                    await LoadSummaryAsync(); // Refresh to update weight displays
+                }
+            }
         }
 
         private async Task LoadSummaryAsync()
@@ -242,7 +243,7 @@ namespace NutriTrack.ViewModels
             foreach (var entry in validMealEntries.OrderBy(e => e.Date))
             {
                 var product = products.First(p => p.Id == entry.ProductId);
-                MealEntries.Add(new MealEntryDisplayModel(entry, product));
+                MealEntries.Add(new MealEntryDisplayModel(entry, product, _weightConversionService, _currentWeightUnit));
             }
         }
     }

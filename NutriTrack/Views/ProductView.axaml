@@ -101,7 +101,7 @@
                                 Padding="16,12"
                                 Margin="0,0,8,0">
                             <StackPanel>
-                                <TextBlock Text="Calories"
+                                <TextBlock Text="Calories per 100g"
                                          FontWeight="SemiBold"
                                          Foreground="#1976d2"/>
                                 <StackPanel Orientation="Horizontal" Spacing="4">
@@ -125,7 +125,7 @@
                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                     <TextBox Text="{Binding SelectedProduct.Protein, Mode=TwoWay}"
                                            Width="80"/>
-                                    <TextBlock Text="g"
+                                    <TextBlock Text="{Binding WeightUnitDisplay, StringFormat='g per 100{0}'}"
                                              VerticalAlignment="Center"/>
                                 </StackPanel>
                             </StackPanel>
@@ -143,7 +143,7 @@
                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                     <TextBox Text="{Binding SelectedProduct.Fat, Mode=TwoWay}"
                                            Width="80"/>
-                                    <TextBlock Text="g"
+                                    <TextBlock Text="{Binding WeightUnitDisplay, StringFormat='g per 100{0}'}"
                                              VerticalAlignment="Center"/>
                                 </StackPanel>
                             </StackPanel>
@@ -155,13 +155,13 @@
                                 Padding="16,12"
                                 Margin="8,0,0,0">
                             <StackPanel>
-                                <TextBlock Text="Carbs"
+                                <TextBlock Text="Carbohydrates"
                                          FontWeight="SemiBold"
                                          Foreground="#9c27b0"/>
                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                     <TextBox Text="{Binding SelectedProduct.Carbohydrates, Mode=TwoWay}"
                                            Width="80"/>
-                                    <TextBlock Text="g"
+                                    <TextBlock Text="{Binding WeightUnitDisplay, StringFormat='g per 100{0}'}"
                                              VerticalAlignment="Center"/>
                                 </StackPanel>
                             </StackPanel>

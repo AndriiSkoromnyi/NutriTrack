@@ -24,9 +24,15 @@ namespace NutriTrack
                 var mealEntryService = new MealEntryService();
                 var dailySummaryService = new DailySummaryService();
                 var userSettingsService = new UserSettingsService();
+                var weightConversionService = new WeightConversionService();
 
                 // Создаем главный ViewModel с внедрением сервисов
-                var mainViewModel = new MainViewModel(productService, mealEntryService, dailySummaryService, userSettingsService);
+                var mainViewModel = new MainViewModel(
+                    productService, 
+                    mealEntryService, 
+                    dailySummaryService, 
+                    userSettingsService,
+                    weightConversionService);
 
                 // Создаем главное окно и задаем DataContext
                 desktop.MainWindow = new MainView

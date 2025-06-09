@@ -12,6 +12,10 @@ namespace NutriTrack.ViewModels
     {
         private readonly IMealEntryService _mealEntryService;
         private readonly IProductService _productService;
+        private readonly IUserSettingsService _userSettingsService;
+        private readonly IWeightConversionService _weightConversionService;
+
+        private WeightUnit _currentWeightUnit = WeightUnit.Grams;
 
         public ObservableCollection<MealEntryDisplayModel> MealEntries { get; } = new();
         public ObservableCollection<Product> Products { get; } = new();
@@ -19,6 +23,22 @@ namespace NutriTrack.ViewModels
         public ObservableCollection<string> MealTypeNames { get; } = new(
             Enum.GetNames(typeof(MealType))
         );
+
+        public string WeightUnitDisplay => _currentWeightUnit == WeightUnit.Grams ? "g" : "oz";
+
+        private double _displayWeight = 100;
+        public double DisplayWeight
+        {
+            get => _displayWeight;
+            set
+            {
+                if (SetProperty(ref _displayWeight, value))
+                {
+                    // Convert display weight (in current unit) to grams for storage
+                    Weight = _weightConversionService.Convert(value, _currentWeightUnit, WeightUnit.Grams);
+                }
+            }
+        }
 
         private MealEntryDisplayModel _selectedMealEntryDisplay;
         public MealEntryDisplayModel SelectedMealEntryDisplay
@@ -144,10 +164,16 @@ namespace NutriTrack.ViewModels
         public IAsyncRelayCommand SaveMealEntryCommand { get; }
         public IAsyncRelayCommand DeleteMealEntryCommand { get; }
 
-        public MealEntryViewModel(IMealEntryService mealEntryService, IProductService productService)
+        public MealEntryViewModel(
+            IMealEntryService mealEntryService,
+            IProductService productService,
+            IUserSettingsService userSettingsService,
+            IWeightConversionService weightConversionService)
         {
             _mealEntryService = mealEntryService ?? throw new ArgumentNullException(nameof(mealEntryService));
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
+            _userSettingsService = userSettingsService ?? throw new ArgumentNullException(nameof(userSettingsService));
+            _weightConversionService = weightConversionService ?? throw new ArgumentNullException(nameof(weightConversionService));
 
             LoadMealEntriesCommand = new AsyncRelayCommand(LoadMealEntriesAsync);
             AddMealEntryCommand = new AsyncRelayCommand(AddMealEntryAsync, CanAddMealEntry);
@@ -155,8 +181,27 @@ namespace NutriTrack.ViewModels
             DeleteMealEntryCommand = new AsyncRelayCommand(DeleteMealEntryAsync, CanDeleteMealEntry);
 
             _productService.ProductsChanged += async (s, e) => await LoadProductsAndRefreshEntriesAsync();
+            _userSettingsService.SettingsChanged += async (s, e) => await LoadUserSettingsAsync();
             
             _ = LoadProductsAndRefreshEntriesAsync();
+            _ = LoadUserSettingsAsync();
+        }
+
+        private async Task LoadUserSettingsAsync()
+        {
+            var settings = await _userSettingsService.LoadSettingsAsync();
+            if (settings != null && settings.WeightUnit != _currentWeightUnit)
+            {
+                _currentWeightUnit = settings.WeightUnit;
+                OnPropertyChanged(nameof(WeightUnitDisplay));
+                
+                // Convert current weight to new unit for display
+                _displayWeight = _weightConversionService.Convert(Weight, WeightUnit.Grams, _currentWeightUnit);
+                OnPropertyChanged(nameof(DisplayWeight));
+                
+                // Refresh entries to update their display
+                await LoadMealEntriesAsync();
+            }
         }
 
         private bool CanAddMealEntry()
@@ -206,7 +251,7 @@ namespace NutriTrack.ViewModels
                 var product = products.FirstOrDefault(p => p.Id == entry.ProductId);
                 if (product != null) 
                 {
-                    var displayModel = new MealEntryDisplayModel(entry, product);
+                    var displayModel = new MealEntryDisplayModel(entry, product, _weightConversionService, _currentWeightUnit);
                     MealEntries.Add(displayModel);
                 }
             }
@@ -272,16 +317,25 @@ namespace NutriTrack.ViewModels
     {
         private readonly MealEntry _mealEntry;
         private readonly Product _product;
+        private readonly IWeightConversionService _weightConversionService;
+        private readonly WeightUnit _displayUnit;
 
-        public MealEntryDisplayModel(MealEntry mealEntry, Product product)
+        public MealEntryDisplayModel(
+            MealEntry mealEntry,
+            Product product,
+            IWeightConversionService weightConversionService,
+            WeightUnit displayUnit)
         {
             _mealEntry = mealEntry;
             _product = product;
+            _weightConversionService = weightConversionService;
+            _displayUnit = displayUnit;
         }
 
         public string MealType => _mealEntry.MealType.ToString();
         public string ProductName => _product.Name;
-        public double Weight => _mealEntry.Weight;
+        public double Weight => _weightConversionService.Convert(_mealEntry.Weight, WeightUnit.Grams, _displayUnit);
+        public string WeightDisplay => _weightConversionService.FormatWeight(Weight, _displayUnit);
         public double Calories => Math.Round(_product.CaloriesPer100g * _mealEntry.Weight / 100.0, 1);
         public DateTime Date => _mealEntry.Date;
         public MealEntry MealEntry => _mealEntry;

@@ -7,66 +7,139 @@
              x:Class="NutriTrack.Views.SettingsView"
              x:DataType="vm:SettingsViewModel">
 
-    <StackPanel Margin="20" Spacing="15">
-        <TextBlock Text="Daily Goals" FontSize="24" FontWeight="Bold"/>
-        
-        <!-- Calories -->
-        <StackPanel>
-            <TextBlock Text="Daily Calorie Goal:" Margin="0,0,0,5"/>
-            <NumericUpDown Value="{Binding Settings.DailyCalorieGoal}"
-                          Minimum="0"
-                          Maximum="10000"
-                          Increment="50"
-                          Width="200"
-                          HorizontalAlignment="Left"/>
-        </StackPanel>
+    <ScrollViewer>
+        <Border Background="#f5f5f5" 
+                CornerRadius="8" 
+                Padding="24" 
+                Margin="20">
+            <StackPanel Spacing="24">
+                <!-- Header -->
+                <TextBlock Text="Settings" 
+                         FontSize="32" 
+                         FontWeight="SemiBold"
+                         Foreground="#1a1a1a"/>
 
-        <!-- Protein -->
-        <StackPanel>
-            <TextBlock Text="Daily Protein Goal (g):" Margin="0,0,0,5"/>
-            <NumericUpDown Value="{Binding Settings.DailyProteinGoal}"
-                          Minimum="0"
-                          Maximum="500"
-                          Increment="5"
-                          Width="200"
-                          HorizontalAlignment="Left"/>
-        </StackPanel>
+                <!-- Weight Unit Section -->
+                <Border Background="White" 
+                        CornerRadius="8" 
+                        Padding="20"
+                        BoxShadow="0 2 4 0 #20000000">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Measurement Units" 
+                                 FontSize="20" 
+                                 FontWeight="SemiBold"
+                                 Foreground="#1a1a1a"/>
+                        <TextBlock Text="Choose your preferred unit of measurement for weight"
+                                 Foreground="#666666"
+                                 FontSize="14"/>
+                        <ComboBox ItemsSource="{Binding WeightUnits}"
+                                SelectedItem="{Binding Settings.WeightUnit}"
+                                Width="200"
+                                HorizontalAlignment="Left"
+                                Margin="0,8,0,0"/>
+                    </StackPanel>
+                </Border>
 
-        <!-- Fat -->
-        <StackPanel>
-            <TextBlock Text="Daily Fat Goal (g):" Margin="0,0,0,5"/>
-            <NumericUpDown Value="{Binding Settings.DailyFatGoal}"
-                          Minimum="0"
-                          Maximum="500"
-                          Increment="5"
-                          Width="200"
-                          HorizontalAlignment="Left"/>
-        </StackPanel>
+                <!-- Daily Goals Section -->
+                <Border Background="White" 
+                        CornerRadius="8" 
+                        Padding="20"
+                        BoxShadow="0 2 4 0 #20000000">
+                    <StackPanel Spacing="20">
+                        <TextBlock Text="Daily Nutrition Goals" 
+                                 FontSize="20" 
+                                 FontWeight="SemiBold"
+                                 Foreground="#1a1a1a"/>
+                        
+                        <!-- Calories -->
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Daily Calorie Goal"
+                                     FontWeight="Medium"
+                                     Foreground="#333333"/>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <NumericUpDown Value="{Binding Settings.DailyCalorieGoal}"
+                                             Minimum="0"
+                                             Maximum="10000"
+                                             Increment="50"
+                                             Width="200"
+                                             HorizontalAlignment="Left"/>
+                                <TextBlock Text="kcal"
+                                         Grid.Column="1"
+                                         VerticalAlignment="Center"
+                                         Margin="8,0,0,0"
+                                         Foreground="#666666"/>
+                            </Grid>
+                        </StackPanel>
 
-        <!-- Carbs -->
-        <StackPanel>
-            <TextBlock Text="Daily Carbs Goal (g):" Margin="0,0,0,5"/>
-            <NumericUpDown Value="{Binding Settings.DailyCarbsGoal}"
-                          Minimum="0"
-                          Maximum="1000"
-                          Increment="5"
-                          Width="200"
-                          HorizontalAlignment="Left"/>
-        </StackPanel>
+                        <!-- Protein -->
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Daily Protein Goal"
+                                     FontWeight="Medium"
+                                     Foreground="#333333"/>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <NumericUpDown Value="{Binding Settings.DailyProteinGoal}"
+                                             Minimum="0"
+                                             Maximum="500"
+                                             Increment="5"
+                                             Width="200"
+                                             HorizontalAlignment="Left"/>
+                                <TextBlock Text="{Binding WeightUnitDisplay}"
+                                         Grid.Column="1"
+                                         VerticalAlignment="Center"
+                                         Margin="8,0,0,0"
+                                         Foreground="#666666"/>
+                            </Grid>
+                        </StackPanel>
 
-        <!-- Weight Unit -->
-        <StackPanel>
-            <TextBlock Text="Weight Unit:" Margin="0,0,0,5"/>
-            <ComboBox ItemsSource="{Binding WeightUnits}"
-                      SelectedItem="{Binding Settings.WeightUnit}"
-                      Width="200"
-                      HorizontalAlignment="Left"/>
-        </StackPanel>
+                        <!-- Fat -->
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Daily Fat Goal"
+                                     FontWeight="Medium"
+                                     Foreground="#333333"/>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <NumericUpDown Value="{Binding Settings.DailyFatGoal}"
+                                             Minimum="0"
+                                             Maximum="500"
+                                             Increment="5"
+                                             Width="200"
+                                             HorizontalAlignment="Left"/>
+                                <TextBlock Text="{Binding WeightUnitDisplay}"
+                                         Grid.Column="1"
+                                         VerticalAlignment="Center"
+                                         Margin="8,0,0,0"
+                                         Foreground="#666666"/>
+                            </Grid>
+                        </StackPanel>
 
-        <!-- Save Button -->
-        <Button Content="Save Settings"
-                Command="{Binding SaveSettingsCommand}"
-                HorizontalAlignment="Left"
-                Margin="0,10,0,0"/>
-    </StackPanel>
+                        <!-- Carbs -->
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Daily Carbs Goal"
+                                     FontWeight="Medium"
+                                     Foreground="#333333"/>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <NumericUpDown Value="{Binding Settings.DailyCarbsGoal}"
+                                             Minimum="0"
+                                             Maximum="1000"
+                                             Increment="5"
+                                             Width="200"
+                                             HorizontalAlignment="Left"/>
+                                <TextBlock Text="{Binding WeightUnitDisplay}"
+                                         Grid.Column="1"
+                                         VerticalAlignment="Center"
+                                         Margin="8,0,0,0"
+                                         Foreground="#666666"/>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Save Button -->
+                <Button Content="Save Changes"
+                        Command="{Binding SaveSettingsCommand}"
+                        HorizontalAlignment="Left"
+                        Classes="accent"
+                        Padding="16,8"/>
+            </StackPanel>
+        </Border>
+    </ScrollViewer>
 </UserControl>

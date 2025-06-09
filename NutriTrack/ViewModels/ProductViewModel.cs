@@ -9,6 +9,11 @@ namespace NutriTrack.ViewModels
     public class ProductViewModel : ViewModelBase
     {
         private readonly IProductService _productService;
+        private readonly IUserSettingsService _userSettingsService;
+        private readonly IWeightConversionService _weightConversionService;
+        private WeightUnit _currentWeightUnit = WeightUnit.Grams;
+
+        public string WeightUnitDisplay => _currentWeightUnit == WeightUnit.Grams ? "g" : "oz";
 
         public ObservableCollection<Product> Products { get; } = new ObservableCollection<Product>();
 
@@ -24,17 +29,35 @@ namespace NutriTrack.ViewModels
         public IAsyncRelayCommand SaveProductCommand { get; }
         public IAsyncRelayCommand DeleteProductCommand { get; }
 
-        public ProductViewModel(IProductService productService)
+        public ProductViewModel(
+            IProductService productService,
+            IUserSettingsService userSettingsService,
+            IWeightConversionService weightConversionService)
         {
             _productService = productService;
+            _userSettingsService = userSettingsService;
+            _weightConversionService = weightConversionService;
 
             LoadProductsCommand = new AsyncRelayCommand(LoadProductsAsync);
             AddProductCommand = new AsyncRelayCommand(AddProductAsync);
             SaveProductCommand = new AsyncRelayCommand(SaveProductAsync);
             DeleteProductCommand = new AsyncRelayCommand(DeleteProductAsync);
 
-            // Load products when ViewModel is created
+            _userSettingsService.SettingsChanged += async (s, e) => await LoadUserSettingsAsync();
+
+            // Load initial settings and products
+            _ = LoadUserSettingsAsync();
             _ = LoadProductsAsync();
+        }
+
+        private async Task LoadUserSettingsAsync()
+        {
+            var settings = await _userSettingsService.LoadSettingsAsync();
+            if (settings != null && settings.WeightUnit != _currentWeightUnit)
+            {
+                _currentWeightUnit = settings.WeightUnit;
+                OnPropertyChanged(nameof(WeightUnitDisplay));
+            }
         }
 
         private async Task LoadProductsAsync()

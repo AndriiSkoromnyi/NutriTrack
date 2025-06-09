@@ -10,6 +10,7 @@ namespace NutriTrack.ViewModels
         private readonly IMealEntryService _mealEntryService;
         private readonly IDailySummaryService _dailySummaryService;
         private readonly IUserSettingsService _userSettingsService;
+        private readonly IWeightConversionService _weightConversionService;
 
         // Cached ViewModels
         private readonly ProductViewModel _productViewModel;
@@ -21,7 +22,7 @@ namespace NutriTrack.ViewModels
         public ViewModelBase CurrentViewModel
         {
             get => _currentViewModel;
-            set => SetProperty(ref _currentViewModel, value);
+            private set => SetProperty(ref _currentViewModel, value);
         }
 
         public ICommand ShowProductsCommand { get; }
@@ -29,21 +30,24 @@ namespace NutriTrack.ViewModels
         public ICommand ShowDailySummaryCommand { get; }
         public ICommand ShowSettingsCommand { get; }
 
-        public MainViewModel(IProductService productService,
-                             IMealEntryService mealEntryService,
-                             IDailySummaryService dailySummaryService,
-                             IUserSettingsService userSettingsService)
+        public MainViewModel(
+            IProductService productService,
+            IMealEntryService mealEntryService,
+            IDailySummaryService dailySummaryService,
+            IUserSettingsService userSettingsService,
+            IWeightConversionService weightConversionService)
         {
             _productService = productService;
             _mealEntryService = mealEntryService;
             _dailySummaryService = dailySummaryService;
             _userSettingsService = userSettingsService;
+            _weightConversionService = weightConversionService;
 
             // Initialize cached ViewModels
-            _productViewModel = new ProductViewModel(_productService);
-            _mealEntryViewModel = new MealEntryViewModel(_mealEntryService, _productService);
-            _dailySummaryViewModel = new DailySummaryViewModel(_dailySummaryService, _mealEntryService, _productService, _userSettingsService);
-            _settingsViewModel = new SettingsViewModel(_userSettingsService);
+            _productViewModel = new ProductViewModel(_productService, _userSettingsService, _weightConversionService);
+            _mealEntryViewModel = new MealEntryViewModel(_mealEntryService, _productService, _userSettingsService, _weightConversionService);
+            _dailySummaryViewModel = new DailySummaryViewModel(_dailySummaryService, _mealEntryService, _productService, _userSettingsService, _weightConversionService);
+            _settingsViewModel = new SettingsViewModel(_userSettingsService, _weightConversionService);
 
             ShowProductsCommand = new RelayCommand(() => CurrentViewModel = _productViewModel);
             ShowMealEntriesCommand = new RelayCommand(() => CurrentViewModel = _mealEntryViewModel);
@@ -52,6 +56,30 @@ namespace NutriTrack.ViewModels
 
             // Show products by default
             CurrentViewModel = _productViewModel;
+        }
+
+        public void ShowMealEntry()
+        {
+            CurrentViewModel = new MealEntryViewModel(
+                _mealEntryService,
+                _productService,
+                _userSettingsService,
+                _weightConversionService);
+        }
+
+        public void ShowProducts()
+        {
+            CurrentViewModel = new ProductViewModel(_productService, _userSettingsService, _weightConversionService);
+        }
+
+        public void ShowDailySummary()
+        {
+            CurrentViewModel = new DailySummaryViewModel(_dailySummaryService, _mealEntryService, _productService, _userSettingsService, _weightConversionService);
+        }
+
+        public void ShowSettings()
+        {
+            CurrentViewModel = new SettingsViewModel(_userSettingsService, _weightConversionService);
         }
     }
 }

@@ -19,6 +19,8 @@ namespace NutriTrack.Services
 
     public class DailySummaryService : IDailySummaryService
     {
+        private bool _isInitialized;
+        private readonly object _lockObject = new object();
         private readonly string _filePath;
         private readonly JsonSerializerOptions _jsonOptions;
         private List<DailySummary> _dailySummaries;
@@ -40,15 +42,33 @@ namespace NutriTrack.Services
 
         private async Task InitializeAsync()
         {
-            if (!File.Exists(_filePath))
+            if (_isInitialized) return;
+
+            lock (_lockObject)
             {
-                _dailySummaries = new List<DailySummary>();
-                await SaveAllSummariesAsync(_dailySummaries);
-            }
-            else
-            {
-                var json = await File.ReadAllTextAsync(_filePath);
-                _dailySummaries = JsonSerializer.Deserialize<List<DailySummary>>(json, _jsonOptions) ?? new List<DailySummary>();
+                if (_isInitialized) return;
+                
+                try
+                {
+                    if (File.Exists(_filePath))
+                    {
+                        var json = File.ReadAllText(_filePath);
+                        _dailySummaries = JsonSerializer.Deserialize<List<DailySummary>>(json, _jsonOptions) ?? new List<DailySummary>();
+                    }
+                    else
+                    {
+                        _dailySummaries = new List<DailySummary>();
+                        var json = JsonSerializer.Serialize(_dailySummaries, _jsonOptions);
+                        File.WriteAllText(_filePath, json);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _dailySummaries = new List<DailySummary>();
+                    Console.WriteLine($"Error initializing daily summaries: {ex.Message}");
+                }
+
+                _isInitialized = true;
             }
         }
 
@@ -75,12 +95,7 @@ namespace NutriTrack.Services
 
         public async Task<DailySummary> LoadDailySummaryAsync(DateTime date)
         {
-            // Ensure initialization is complete
-            if (_dailySummaries == null)
-            {
-                await InitializeAsync();
-            }
-
+            await InitializeAsync();
             return _dailySummaries.FirstOrDefault(s => s.Date.Date == date.Date) ?? new DailySummary { Date = date };
         }
 

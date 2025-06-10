@@ -20,6 +20,8 @@ namespace NutriTrack.Services
 
     public class ProductService : IProductService
     {
+        private bool _isInitialized;
+        private readonly object _lockObject = new object();
         private readonly string _filePath;
         private readonly JsonSerializerOptions _jsonOptions;
         private List<Product> _products;
@@ -42,25 +44,40 @@ namespace NutriTrack.Services
 
         private async Task InitializeAsync()
         {
-            if (!File.Exists(_filePath))
+            if (_isInitialized) return;
+
+            lock (_lockObject)
             {
-                _products = new List<Product>();
-                await SaveProductsAsync(_products);
-            }
-            else
-            {
-                var json = await File.ReadAllTextAsync(_filePath);
-                _products = JsonSerializer.Deserialize<List<Product>>(json, _jsonOptions) ?? new List<Product>();
+                if (_isInitialized) return;
+                
+                try
+                {
+                    if (File.Exists(_filePath))
+                    {
+                        var json = File.ReadAllText(_filePath);
+                        _products = JsonSerializer.Deserialize<List<Product>>(json, _jsonOptions) ?? new List<Product>();
+                        ProductsChanged?.Invoke(this, EventArgs.Empty);
+                    }
+                    else
+                    {
+                        _products = new List<Product>();
+                        var json = JsonSerializer.Serialize(_products, _jsonOptions);
+                        File.WriteAllText(_filePath, json);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _products = new List<Product>();
+                    Console.WriteLine($"Error initializing products: {ex.Message}");
+                }
+
+                _isInitialized = true;
             }
         }
 
         public async Task<List<Product>> LoadProductsAsync()
         {
-            // Ensure initialization is complete
-            if (_products == null)
-            {
-                await InitializeAsync();
-            }
+            await InitializeAsync();
             return new List<Product>(_products);
         }
 
@@ -68,20 +85,21 @@ namespace NutriTrack.Services
         {
             var json = JsonSerializer.Serialize(products, _jsonOptions);
             await File.WriteAllTextAsync(_filePath, json);
-            _products = products;
+            _products = new List<Product>(products);
+            _isInitialized = true;
             ProductsChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public async Task AddProductAsync(Product product)
         {
-            await LoadProductsAsync(); 
+            await InitializeAsync();
             _products.Add(product);
             await SaveProductsAsync(_products);
         }
 
         public async Task UpdateProductAsync(Product product)
         {
-            await LoadProductsAsync(); 
+            await InitializeAsync();
             var index = _products.FindIndex(p => p.Id == product.Id);
             if (index >= 0)
             {
@@ -96,7 +114,7 @@ namespace NutriTrack.Services
 
         public async Task DeleteProductAsync(Guid productId)
         {
-            await LoadProductsAsync(); 
+            await InitializeAsync();
             _products.RemoveAll(p => p.Id == productId);
             await SaveProductsAsync(_products);
         }

@@ -22,6 +22,8 @@ namespace NutriTrack.Services
 
     public class MealEntryService : IMealEntryService
     {
+        private bool _isInitialized;
+        private readonly object _lockObject = new object();
         private readonly string _filePath;
         private readonly JsonSerializerOptions _jsonOptions;
         private List<MealEntry> _mealEntries;
@@ -45,29 +47,41 @@ namespace NutriTrack.Services
 
         private async Task InitializeAsync()
         {
-            if (!File.Exists(_filePath))
+            if (_isInitialized) return;
+
+            lock (_lockObject)
             {
-                _mealEntries = new List<MealEntry>();
-                await SaveMealEntriesAsync(_mealEntries);
-            }
-            else
-            {
-                var json = await File.ReadAllTextAsync(_filePath);
-                _mealEntries = JsonSerializer.Deserialize<List<MealEntry>>(json, _jsonOptions) ?? new List<MealEntry>();
+                if (_isInitialized) return;
+                
+                try
+                {
+                    if (File.Exists(_filePath))
+                    {
+                        var json = File.ReadAllText(_filePath);
+                        _mealEntries = JsonSerializer.Deserialize<List<MealEntry>>(json, _jsonOptions) ?? new List<MealEntry>();
+                    }
+                    else
+                    {
+                        _mealEntries = new List<MealEntry>();
+                        var json = JsonSerializer.Serialize(_mealEntries, _jsonOptions);
+                        File.WriteAllText(_filePath, json);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _mealEntries = new List<MealEntry>();
+                    Console.WriteLine($"Error initializing meal entries: {ex.Message}");
+                }
+
+                _isInitialized = true;
             }
         }
 
         public async Task<List<MealEntry>> LoadMealEntriesAsync(DateTime date)
         {
-            // Ensure initialization is complete
-            if (_mealEntries == null)
-            {
-                await InitializeAsync();
-            }
-            
+            await InitializeAsync();
             return _mealEntries
                 .Where(e => e.Date.Date == date.Date)
-                .Select(e => e)
                 .ToList();
         }
 

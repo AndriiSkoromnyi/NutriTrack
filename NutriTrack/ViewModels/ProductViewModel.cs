@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using NutriTrack.Models;
@@ -44,10 +45,16 @@ namespace NutriTrack.ViewModels
             DeleteProductCommand = new AsyncRelayCommand(DeleteProductAsync);
 
             _userSettingsService.SettingsChanged += async (s, e) => await LoadUserSettingsAsync();
+            _productService.ProductsChanged += async (s, e) => await LoadProductsAsync();
 
             // Load initial settings and products
-            _ = LoadUserSettingsAsync();
-            _ = LoadProductsAsync();
+            LoadInitialDataAsync().ConfigureAwait(false);
+        }
+
+        private async Task LoadInitialDataAsync()
+        {
+            await LoadUserSettingsAsync();
+            await LoadProductsAsync();
         }
 
         private async Task LoadUserSettingsAsync()
@@ -62,17 +69,19 @@ namespace NutriTrack.ViewModels
 
         private async Task LoadProductsAsync()
         {
-            Products.Clear();
             var products = await _productService.LoadProductsAsync();
-            foreach (var p in products)
-                Products.Add(p);
+            
+            Products.Clear();
+            foreach (var product in products)
+            {
+                Products.Add(product);
+            }
         }
 
         private async Task AddProductAsync()
         {
             var newProduct = new Product { Name = "New Product" };
             await _productService.AddProductAsync(newProduct);
-            Products.Add(newProduct);
             SelectedProduct = newProduct;
         }
 
@@ -87,7 +96,6 @@ namespace NutriTrack.ViewModels
             if (SelectedProduct != null)
             {
                 await _productService.DeleteProductAsync(SelectedProduct.Id);
-                Products.Remove(SelectedProduct);
                 SelectedProduct = null;
             }
         }

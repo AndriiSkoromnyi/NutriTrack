@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using NutriTrack.Models;
+using NutriTrack.Helpers;
 
 namespace NutriTrack.Services
 {
@@ -22,40 +23,52 @@ namespace NutriTrack.Services
     public class MealEntryService : IMealEntryService
     {
         private readonly string _filePath;
-        private List<MealEntry> _mealEntries = new List<MealEntry>();
         private readonly JsonSerializerOptions _jsonOptions;
+        private List<MealEntry> _mealEntries;
 
         public event EventHandler MealEntriesChanged;
 
         public MealEntryService()
         {
-            var appDataPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "NutriTrack"
-            );
-            Directory.CreateDirectory(appDataPath);
-            _filePath = Path.Combine(appDataPath, "mealEntries.json");
+            var dataPath = DataPathHelper.GetDataPath();
+            _filePath = Path.Combine(dataPath, "mealEntries.json");
 
             _jsonOptions = new JsonSerializerOptions
             {
                 WriteIndented = true,
-                Converters = { new DateTimeJsonConverter() }
+                Converters = { new DateTimeConverter() }
             };
+            
+            _mealEntries = new List<MealEntry>();
+            _ = InitializeAsync();
         }
 
-        public async Task<List<MealEntry>> LoadMealEntriesAsync(DateTime date)
+        private async Task InitializeAsync()
         {
             if (!File.Exists(_filePath))
             {
                 _mealEntries = new List<MealEntry>();
                 await SaveMealEntriesAsync(_mealEntries);
-                return _mealEntries.Where(e => e.Date.Date == date.Date).ToList();
             }
+            else
+            {
+                var json = await File.ReadAllTextAsync(_filePath);
+                _mealEntries = JsonSerializer.Deserialize<List<MealEntry>>(json, _jsonOptions) ?? new List<MealEntry>();
+            }
+        }
 
-            var json = await File.ReadAllTextAsync(_filePath);
-            _mealEntries = JsonSerializer.Deserialize<List<MealEntry>>(json, _jsonOptions) ?? new List<MealEntry>();
-
-            return _mealEntries.Where(e => e.Date.Date == date.Date).ToList();
+        public async Task<List<MealEntry>> LoadMealEntriesAsync(DateTime date)
+        {
+            // Ensure initialization is complete
+            if (_mealEntries == null)
+            {
+                await InitializeAsync();
+            }
+            
+            return _mealEntries
+                .Where(e => e.Date.Date == date.Date)
+                .Select(e => e)
+                .ToList();
         }
 
         public async Task SaveMealEntriesAsync(List<MealEntry> mealEntries)

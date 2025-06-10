@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Linq;
 using NutriTrack.Models;
 
 namespace NutriTrack.Services
@@ -20,35 +21,47 @@ namespace NutriTrack.Services
     public class ProductService : IProductService
     {
         private readonly string _filePath;
-        private List<Product> _products = new List<Product>();
         private readonly JsonSerializerOptions _jsonOptions;
+        private List<Product> _products;
 
         public event EventHandler ProductsChanged;
 
         public ProductService()
         {
-            var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NutriTrack");
-            Directory.CreateDirectory(appDataPath);
-            _filePath = Path.Combine(appDataPath, "products.json");
-            
-            _jsonOptions = new JsonSerializerOptions 
-            { 
-                WriteIndented = true 
+            var dataPath = DataPathHelper.GetDataPath();
+            _filePath = Path.Combine(dataPath, "products.json");
+
+            _jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true
             };
+            
+            _products = new List<Product>();
+            _ = InitializeAsync();
         }
 
-        public async Task<List<Product>> LoadProductsAsync()
+        private async Task InitializeAsync()
         {
             if (!File.Exists(_filePath))
             {
                 _products = new List<Product>();
                 await SaveProductsAsync(_products);
-                return _products;
             }
+            else
+            {
+                var json = await File.ReadAllTextAsync(_filePath);
+                _products = JsonSerializer.Deserialize<List<Product>>(json, _jsonOptions) ?? new List<Product>();
+            }
+        }
 
-            var json = await File.ReadAllTextAsync(_filePath);
-            _products = JsonSerializer.Deserialize<List<Product>>(json, _jsonOptions) ?? new List<Product>();
-            return _products;
+        public async Task<List<Product>> LoadProductsAsync()
+        {
+            // Ensure initialization is complete
+            if (_products == null)
+            {
+                await InitializeAsync();
+            }
+            return new List<Product>(_products);
         }
 
         public async Task SaveProductsAsync(List<Product> products)

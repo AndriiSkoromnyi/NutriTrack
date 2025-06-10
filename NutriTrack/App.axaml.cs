@@ -14,19 +14,19 @@ namespace NutriTrack
             AvaloniaXamlLoader.Load(this);
         }
 
-        // Точка входа после инициализации приложения
+        // Entry point after application initialization
         public override void OnFrameworkInitializationCompleted()
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                // Создаем сервисы
+                // Create services
                 var productService = new ProductService();
                 var mealEntryService = new MealEntryService();
                 var dailySummaryService = new DailySummaryService();
                 var userSettingsService = new UserSettingsService();
                 var weightConversionService = new WeightConversionService();
 
-                // Создаем главный ViewModel с внедрением сервисов
+                // Create main ViewModel with service injection
                 var mainViewModel = new MainViewModel(
                     productService, 
                     mealEntryService, 
@@ -34,7 +34,7 @@ namespace NutriTrack
                     userSettingsService,
                     weightConversionService);
 
-                // Создаем главное окно и задаем DataContext
+                // Create main window and set DataContext
                 desktop.MainWindow = new MainView
                 {
                     DataContext = mainViewModel

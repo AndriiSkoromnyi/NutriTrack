@@ -195,9 +195,14 @@ namespace NutriTrack.ViewModels
                 _currentWeightUnit = settings.WeightUnit;
                 OnPropertyChanged(nameof(WeightUnitDisplay));
                 
-                // Convert current weight to new unit for display
+                // Convert current weight to new unit for display and notify changes
                 _displayWeight = _weightConversionService.Convert(Weight, WeightUnit.Grams, _currentWeightUnit);
                 OnPropertyChanged(nameof(DisplayWeight));
+                
+                // Update the Weight property to trigger UI refresh
+                var newWeight = Weight;
+                Weight = 0; // Force change
+                Weight = newWeight;
                 
                 // Refresh entries to update their display
                 await LoadMealEntriesAsync();

@@ -162,10 +162,12 @@
                                      Minimum="0"
                                      Maximum="2000"
                                      Increment="10"
-                                     Width="120"
+                                     Width="160"
+                                     FontSize="16"
                                      HorizontalAlignment="Left"/>
                         <TextBlock Text="{Binding WeightUnitDisplay}"
-                                 VerticalAlignment="Center"/>
+                                 VerticalAlignment="Center"
+                                 FontSize="16"/>
                     </StackPanel>
 
                     <TextBlock Text="Meal Type:"

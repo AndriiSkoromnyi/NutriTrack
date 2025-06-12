@@ -22,8 +22,12 @@ namespace NutriTrack.Services
 
         public UserSettingsService()
         {
-            var dataPath = DataPathHelper.GetDataPath();
-            _filePath = Path.Combine(dataPath, "settings.json");
+            var appDataPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "NutriTrack"
+            );
+            Directory.CreateDirectory(appDataPath);
+            _filePath = Path.Combine(appDataPath, "settings.json");
 
             _jsonOptions = new JsonSerializerOptions
             {

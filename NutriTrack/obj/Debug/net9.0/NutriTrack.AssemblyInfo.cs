@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NutriTrack")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+be2d8f408260610732417f2edc8b8e0782b050f7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cc10318a41238df19fa1e6e6f142ac397c2cdcfe")]
 [assembly: System.Reflection.AssemblyProductAttribute("NutriTrack")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NutriTrack")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

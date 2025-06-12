@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using NutriTrack.Models;
-using NutriTrack.Helpers;
+using NutriTrack.Converters;
 
 namespace NutriTrack.Services
 {
@@ -38,7 +38,7 @@ namespace NutriTrack.Services
             _jsonOptions = new JsonSerializerOptions
             {
                 WriteIndented = true,
-                Converters = { new DateTimeConverter() }
+                Converters = { new DateTimeJsonConverter() }
             };
             
             _mealEntries = new List<MealEntry>();

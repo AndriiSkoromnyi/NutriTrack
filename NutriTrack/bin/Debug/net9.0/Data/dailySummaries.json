@@ -1,10 +1,10 @@
 [
   {
-    "Date": "2025-06-10T19:38:42.1764148",
-    "TotalCalories": 100,
-    "TotalProtein": 50,
-    "TotalFat": 60,
-    "TotalCarbohydrates": 2.1,
+    "Date": "2025-06-10T00:00:00.0000000",
+    "TotalCalories": 54,
+    "TotalProtein": 2.9,
+    "TotalFat": 2.5,
+    "TotalCarbohydrates": 40.8,
     "MealEntries": [
       {
         "Id": "a4f70d44-73c4-4e85-abd1-733eacb1699c",
@@ -14,5 +14,36 @@
         "Date": "2025-06-10T19:38:00.0000000"
       }
     ]
+  },
+  {
+    "Date": "2025-06-11T00:00:00.0000000",
+    "TotalCalories": 668,
+    "TotalProtein": 12.46,
+    "TotalFat": 1.3800000000000001,
+    "TotalCarbohydrates": 174.16000000000003,
+    "MealEntries": [
+      {
+        "Id": "288933c3-9a88-47ce-bf10-294f19530202",
+        "ProductId": "ca9d5905-5ddb-48dd-9848-cabc3b3a44da",
+        "Weight": 40,
+        "MealType": 1,
+        "Date": "2025-06-11T08:00:00.0000000"
+      },
+      {
+        "Id": "571a1c4a-1119-4875-b2cf-8482e4cfa541",
+        "ProductId": "d213545d-554f-4901-811c-0808a6228dcd",
+        "Weight": 180,
+        "MealType": 3,
+        "Date": "2025-06-11T08:00:00.0000000"
+      }
+    ]
+  },
+  {
+    "Date": "2025-06-12T20:04:05.1077126",
+    "TotalCalories": 0,
+    "TotalProtein": 0,
+    "TotalFat": 0,
+    "TotalCarbohydrates": 0,
+    "MealEntries": []
   }
 ]

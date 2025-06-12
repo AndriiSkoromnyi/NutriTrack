@@ -24,7 +24,72 @@ namespace NutriTrack.ViewModels
         public Product SelectedProduct
         {
             get => _selectedProduct;
-            set => SetProperty(ref _selectedProduct, value);
+            set
+            {
+                if (SetProperty(ref _selectedProduct, value))
+                {
+                    if (value != null)
+                    {
+                        EditName = value.Name;
+                        EditCaloriesPer100g = value.CaloriesPer100g;
+                        EditProtein = value.Protein;
+                        EditFat = value.Fat;
+                        EditCarbohydrates = value.Carbohydrates;
+                    }
+                }
+            }
+        }
+
+        // Temporary editable fields
+        private string _editName;
+        public string EditName
+        {
+            get => _editName;
+            set
+            {
+                if (SetProperty(ref _editName, value))
+                    SaveProductCommand.NotifyCanExecuteChanged();
+            }
+        }
+        private double _editCaloriesPer100g;
+        public double EditCaloriesPer100g
+        {
+            get => _editCaloriesPer100g;
+            set
+            {
+                if (SetProperty(ref _editCaloriesPer100g, value))
+                    SaveProductCommand.NotifyCanExecuteChanged();
+            }
+        }
+        private double _editProtein;
+        public double EditProtein
+        {
+            get => _editProtein;
+            set
+            {
+                if (SetProperty(ref _editProtein, value))
+                    SaveProductCommand.NotifyCanExecuteChanged();
+            }
+        }
+        private double _editFat;
+        public double EditFat
+        {
+            get => _editFat;
+            set
+            {
+                if (SetProperty(ref _editFat, value))
+                    SaveProductCommand.NotifyCanExecuteChanged();
+            }
+        }
+        private double _editCarbohydrates;
+        public double EditCarbohydrates
+        {
+            get => _editCarbohydrates;
+            set
+            {
+                if (SetProperty(ref _editCarbohydrates, value))
+                    SaveProductCommand.NotifyCanExecuteChanged();
+            }
         }
 
         public string ErrorMessage
@@ -93,29 +158,24 @@ namespace NutriTrack.ViewModels
             SelectedProduct = newProduct;
         }
 
-        private bool ValidateProduct(Product product)
+        private bool ValidateProductFields()
         {
-            if (product == null)
-            {
-                ErrorMessage = "No product selected.";
-                return false;
-            }
-            if (string.IsNullOrWhiteSpace(product.Name))
+            if (string.IsNullOrWhiteSpace(EditName))
             {
                 ErrorMessage = "Product name cannot be empty.";
                 return false;
             }
-            if (Products.Any(p => p.Id != product.Id && p.Name.Trim().ToLower() == product.Name.Trim().ToLower()))
+            if (Products.Any(p => p.Id != SelectedProduct?.Id && p.Name.Trim().ToLower() == EditName.Trim().ToLower()))
             {
                 ErrorMessage = "A product with this name already exists.";
                 return false;
             }
-            if (product.CaloriesPer100g < 0 || product.Protein < 0 || product.Fat < 0 || product.Carbohydrates < 0)
+            if (EditCaloriesPer100g < 0 || EditProtein < 0 || EditFat < 0 || EditCarbohydrates < 0)
             {
                 ErrorMessage = "Calories, protein, fat, and carbohydrates cannot be negative.";
                 return false;
             }
-            if (product.Protein + product.Fat + product.Carbohydrates > 100)
+            if (EditProtein + EditFat + EditCarbohydrates > 100)
             {
                 ErrorMessage = "Sum of protein, fat, and carbohydrates cannot exceed 100g per 100g.";
                 return false;
@@ -126,14 +186,31 @@ namespace NutriTrack.ViewModels
 
         private bool CanSaveProduct()
         {
-            return ValidateProduct(SelectedProduct);
+            return SelectedProduct != null && ValidateProductFields();
         }
 
         private async Task SaveProductAsync()
         {
-            if (!ValidateProduct(SelectedProduct))
-                return;
+            if (SelectedProduct == null) return;
+            if (!ValidateProductFields()) return;
+            SelectedProduct.Name = EditName;
+            SelectedProduct.CaloriesPer100g = EditCaloriesPer100g;
+            SelectedProduct.Protein = EditProtein;
+            SelectedProduct.Fat = EditFat;
+            SelectedProduct.Carbohydrates = EditCarbohydrates;
+            var id = SelectedProduct.Id;
             await _productService.UpdateProductAsync(SelectedProduct);
+            await LoadProductsAsync();
+            var updated = Products.FirstOrDefault(p => p.Id == id);
+            if (updated != null)
+            {
+                SelectedProduct = updated;
+                EditName = updated.Name;
+                EditCaloriesPer100g = updated.CaloriesPer100g;
+                EditProtein = updated.Protein;
+                EditFat = updated.Fat;
+                EditCarbohydrates = updated.Carbohydrates;
+            }
         }
 
         private async Task DeleteProductAsync()

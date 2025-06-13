@@ -26,13 +26,16 @@
                                 Classes="accent"
                                 Content="Add Product"/>
                     </Grid>
+                    <TextBox Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                             Watermark="Search by name..."
+                             Margin="0,8,0,0"/>
                     <TextBlock Text="Select a product to edit its details"
                              Foreground="#666666"
                              FontSize="12"
                              Margin="0,4,0,0"/>
                 </StackPanel>
 
-                <ListBox ItemsSource="{Binding Products}" 
+                <ListBox ItemsSource="{Binding FilteredProducts}" 
                         SelectedItem="{Binding SelectedProduct}"
                         Background="Transparent">
                     <ListBox.ItemTemplate>

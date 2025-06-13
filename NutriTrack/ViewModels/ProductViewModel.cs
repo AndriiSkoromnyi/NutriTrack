@@ -103,6 +103,31 @@ namespace NutriTrack.ViewModels
         public IAsyncRelayCommand SaveProductCommand { get; }
         public IAsyncRelayCommand DeleteProductCommand { get; }
 
+        private string _searchText;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (SetProperty(ref _searchText, value))
+                {
+                    UpdateFilteredProducts();
+                }
+            }
+        }
+
+        public ObservableCollection<Product> FilteredProducts { get; } = new ObservableCollection<Product>();
+
+        private void UpdateFilteredProducts()
+        {
+            FilteredProducts.Clear();
+            var filtered = string.IsNullOrWhiteSpace(SearchText)
+                ? Products
+                : Products.Where(p => p.Name != null && p.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+            foreach (var product in filtered)
+                FilteredProducts.Add(product);
+        }
+
         public ProductViewModel(
             IProductService productService,
             IUserSettingsService userSettingsService,
@@ -149,6 +174,7 @@ namespace NutriTrack.ViewModels
             {
                 Products.Add(product);
             }
+            UpdateFilteredProducts();
         }
 
         private async Task AddProductAsync()
